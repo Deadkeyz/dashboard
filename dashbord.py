@@ -2,10 +2,10 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_recall_curve
 from sklearn.preprocessing import OneHotEncoder, RobustScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -118,15 +118,24 @@ def main():
 
             if model_choice == "Régression Logistique":
                 model = LogisticRegression(max_iter=1000)
+                param_grid = {
+                    'classifier__C': [0.1, 1.0, 10],
+                    'classifier__solver': ['liblinear', 'saga']
+                }
             else:
                 model = DecisionTreeClassifier()
+                param_grid = {
+                    'classifier__max_depth': [5, 10, 20],
+                    'classifier__min_samples_split': [2, 10, 20]
+                }
 
             clf = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', model)])
 
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-            clf.fit(X_train, y_train)
-            y_pred = clf.predict(X_test)
+            grid_search = GridSearchCV(clf, param_grid, cv=5, scoring='f1_weighted')
+            grid_search.fit(X_train, y_train)
+            y_pred = grid_search.predict(X_test)
 
             st.header("Évaluation du modèle")
             accuracy = accuracy_score(y_test, y_pred)
@@ -135,8 +144,23 @@ def main():
 
             st.write(f"Accuracy: {accuracy}")
             st.write(f"F1 Score: {f1}")
+            st.write(f"Meilleurs hyperparamètres : {grid_search.best_params_}")
 
             fig = px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion")
+            st.plotly_chart(fig)
+
+            # Tracer les courbes de précision-rappel pour tous les modèles évalués
+            st.header("Courbes de précision-rappel")
+
+            fig = go.Figure()
+            for mean_score, params in zip(grid_search.cv_results_['mean_test_score'], grid_search.cv_results_['params']):
+                clf.set_params(**params)
+                clf.fit(X_train, y_train)
+                y_prob = clf.predict_proba(X_test)[:, 1]
+                precision, recall, _ = precision_recall_curve(y_test, y_prob)
+                fig.add_trace(go.Scatter(x=recall, y=precision, mode='lines', name=str(params)))
+
+            fig.update_layout(title="Courbes de précision-rappel", xaxis_title="Recall", yaxis_title="Precision")
             st.plotly_chart(fig)
         else:
             st.warning("Veuillez uploader un fichier CSV pour modéliser les données.")
