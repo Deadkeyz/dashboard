@@ -19,30 +19,93 @@ st.set_page_config(page_title="Projet Data Science", layout="wide")
 def load_data(file):
     data = pd.read_csv(file)
     return data
+st.sidebar.image("logo.png", use_column_width=True)
 
-# Uploader le fichier CSV
-uploaded_file = st.file_uploader("Choisissez un fichier CSV", type="csv")
+# Uploader le fichier CSV dans la sidebar
+uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type="csv")
+
+# Affichage de l'image du logo dans l'en-tête de la barre latérale
 
 def main():
-    menu = ["Accueil", "Aperçu des données", "Analyse Exploratoire des Données", "Préparation des données", "Modélisation"]
+    menu = ["Accueil", "Compréhension des données", "Préparation des données", "Modélisation et évaluation"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Accueil":
         st.title("Projet Data Science - Prédiction du Risque de Défaut de Crédit")
         st.write("""
+            ## Introduction
             Ce dashboard interactif permet de charger un fichier CSV, d'explorer les données,
-            de les préparer, de construire des modèles de prédiction et d'évaluer leurs performances.
+            de les préparer, de construire des modèles de prédiction et d'évaluer leurs performances. 
+            Dans ce projet, nous allons explorer et analyser un ensemble de données de 5960 observations avec 13 variables, afin de prédire la probabilité de défaut de crédit. Les données contiennent des informations sur les prêts, les hypothèques, les emplois, et d'autres variables financières et démographiques.        
         """)
 
-    elif choice == "Aperçu des données":
+    elif choice == "Compréhension des données":
         if uploaded_file is not None:
-            data = load_data(uploaded_file)
-            st.header("Aperçu des données")
-            st.write(data.head())
-        else:
-            st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
+                data = load_data(uploaded_file)
+                st.header("Aperçu des données")
+                st.write(data.info())
+                st.write(data.head())
+                st.write("""
+                    ## Description des Données
 
-    elif choice == "Analyse Exploratoire des Données":
+                    Les données contiennent les variables suivantes:
+
+                    - **BAD** : Indicateur de défaut (1 = défaut, 0 = non défaut)
+                    - **LOAN** : Montant du prêt
+                    - **MORTDUE** : Montant dû sur l'hypothèque existante
+                    - **VALUE** : Valeur de la propriété actuelle
+                    - **REASON** : Raison de la demande de prêt (HomeImp = amélioration de l'habitat, DebtCon = consolidation de dettes)
+                    - **JOB** : Type d'emploi
+                    - **YOJ** : Nombre d'années à l'emploi actuel
+                    - **DEROG** : Nombre de rapports dérogatoires majeurs
+                    - **DELINQ** : Nombre de délais de paiement de 30 jours ou plus
+                    - **CLAGE** : Âge moyen des lignes de crédit en mois
+                    - **NINQ** : Nombre de demandes de crédit au cours des 6 derniers mois
+                    - **CLNO** : Nombre de lignes de crédit
+                    - **DEBTINC** : Ratio dette/revenu
+                 
+        """)
+
+                st.header("Préparation des données")
+                st.write("Vérification des valeurs manquantes et des valeurs aberrantes")
+                missing_data = data.isnull().sum()
+                st.write(missing_data[missing_data > 0])
+                st.write(""" On remarque que bon nombre de variables ont des **valeurs manquantes**.
+                    
+                    * On a Montant dû sur l'hypothèque existante ici MORTDUE contient **518** valeurs manquantes.
+                    * On a Valeur de la propriété actuelle ici VALUE contient **112** valeurs manquantes.
+                    * On a Raison de la demande de prêt  ici REASON contient **252** valeurs manquantes.
+                    * On a Type d'emploi ici JOB contient **279** valeurs manquantes.
+                    * On a Nombre d'années à l'emploi actuel ici YOJ contient **515** valeurs manquantes.
+                    * On a Nombre de rapports dérogatoires majeurs ici DEROG contient **708** valeurs manquantes.
+                    * On a Nombre de délais de paiement de 30 jours ou plus ici DELINQ contient **580** valeurs manquantes.
+                    * On a Âge moyen des lignes de crédit en mois ici CLAGE contient **308** valeurs manquantes.
+                    * On a Nombre de demandes de crédit au cours des 6 derniers mois ici NINQ contient **510** valeurs manquantes.
+                    * On a Nombre de lignes de crédit ici CLNO contient **221** valeurs manquantes.
+                    * On a Indicateur de défaut  ici BAD contient **0** valeurs manquantes.
+                    * On a Montant du prêt ici LOAN contient **0** valeurs manquantes.     
+                          """)
+                st.write("Gestion des valeurs manquantes")
+                data['REASON'].fillna(data['REASON'].mode()[0], inplace=True)
+                data['JOB'].fillna(data['JOB'].mode()[0], inplace=True)
+                data['MORTDUE'].fillna(data['MORTDUE'].median(), inplace=True)
+                data['VALUE'].fillna(data['VALUE'].median(), inplace=True)
+                data['YOJ'].fillna(data['YOJ'].median(), inplace=True)
+                data['DEROG'].fillna(data['DEROG'].median(), inplace=True)
+                data['DELINQ'].fillna(data['DELINQ'].median(), inplace=True)
+                data['CLAGE'].fillna(data['CLAGE'].median(), inplace=True)
+                data['NINQ'].fillna(data['NINQ'].median(), inplace=True)
+                data['CLNO'].fillna(data['CLNO'].median(), inplace=True)
+                data['DEBTINC'].fillna(data['DEBTINC'].median(), inplace=True)
+
+                st.write("Données après remplacement des valeurs manquantes par le mode et la mediane :")
+                st.write(data.head())
+
+        else:
+               st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
+
+
+    elif choice == "Préparation des données":
         if uploaded_file is not None:
             data = load_data(uploaded_file)
             st.header("Analyse Exploratoire des Données")
@@ -65,27 +128,7 @@ def main():
         else:
             st.warning("Veuillez uploader un fichier CSV pour analyser les données.")
 
-    elif choice == "Préparation des données":
-        if uploaded_file is not None:
-            data = load_data(uploaded_file)
-            st.header("Préparation des données")
-            st.write("Vérification des valeurs manquantes et des valeurs aberrantes")
-            missing_data = data.isnull().sum()
-            st.write(missing_data[missing_data > 0])
-
-            st.write("Gestion des valeurs manquantes")
-            data.dropna(inplace=True)
-            st.write("Données après suppression des valeurs manquantes :")
-            st.write(data.head())
-
-            st.write("Sélection des features et de la cible")
-            target_column = st.selectbox("Sélectionnez la colonne cible", data.columns)
-            X = data.drop(columns=[target_column])
-            y = data[target_column]
-        else:
-            st.warning("Veuillez uploader un fichier CSV pour préparer les données.")
-
-    elif choice == "Modélisation":
+    elif choice == "Modélisation et évaluation":
         if uploaded_file is not None:
             data = load_data(uploaded_file)
             st.header("Modélisation")
@@ -96,13 +139,11 @@ def main():
             numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
             categorical_features = X.select_dtypes(include=['object']).columns
 
-            # Imputer les valeurs manquantes, puis appliquer le scaler
             numeric_transformer = Pipeline(steps=[
                 ('imputer', SimpleImputer(strategy='median')),
                 ('scaler', RobustScaler())
             ])
 
-            # Imputer les valeurs manquantes pour les variables catégorielles
             categorical_transformer = Pipeline(steps=[
                 ('imputer', SimpleImputer(strategy='most_frequent')),
                 ('onehot', OneHotEncoder(drop='first'))
@@ -164,6 +205,7 @@ def main():
             st.plotly_chart(fig)
         else:
             st.warning("Veuillez uploader un fichier CSV pour modéliser les données.")
+    
 
 if __name__ == '__main__':
     main()
