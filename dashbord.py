@@ -242,10 +242,10 @@ def main():
                 
                 for col, comment in univar_comments.items():
                     if col in data.columns:
-                        fig = px.histogram(data, x=col, title=f"Distribution de {col}")
+                        fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=['#effbf0'])
                         st.plotly_chart(fig)
                         st.write(f"Commentaire : {comment}")
-            
+                
                 st.subheader("Relations entre les variables (Bivarié)")
                 bivar_comments = {
                     'LOAN': "La relation entre BAD et LOAN montre que les prêts plus élevés sont associés à un risque plus élevé de défaut. On observe que les individus en défaut (En défaut) ont tendance à avoir des montants de prêt plus élevés comparativement aux individus conformes (Conforme).",
@@ -261,13 +261,14 @@ def main():
                     'CLNO': "La relation entre BAD et CLNO montre que les individus avec un nombre plus élevé de lignes de crédit sont plus susceptibles d'être en défaut. Une prolifération de lignes de crédit peut indiquer une gestion financière risquée.",
                     'DEBTINC': "La relation entre BAD et DEBTINC montre que les individus avec un ratio dette/revenu élevé sont plus susceptibles d'être en défaut. Un ratio dette/revenu élevé indique une charge financière importante par rapport aux revenus, augmentant ainsi le risque de défaut."
                 }
-            
+                
                 for col, comment in bivar_comments.items():
                     if col in data.columns:
                         if data[col].dtype in ['int64', 'float64']:
                             fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
+                            fig.update_traces(marker_color='#effbf0')
                         else:
-                            fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}")
+                            fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=['#effbf0'])
                         st.plotly_chart(fig)
                         st.write(f"Commentaire : {comment}")
             else:
