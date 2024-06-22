@@ -39,7 +39,7 @@ uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type="csv"
 # Affichage de l'image du logo dans l'en-tête de la barre latérale
 
 def main():
-    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation", "Amélioration des Modèles"]
+    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation", "Amélioration du Modèle"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Accueil":
@@ -141,7 +141,8 @@ def main():
 
                 st.write("Données après remplacement des valeurs manquantes par le mode et la médiane :")
                 st.write(data)
-                st.header("Es ce que le jeux de donnee contient des doublons ?")
+                
+                st.header("Est-ce que le jeu de données contient des doublons ?")
                 duplicate_count = data.duplicated().sum()
                 st.write(f"Nombre de doublons : {duplicate_count}")
 
@@ -171,9 +172,9 @@ def main():
                 st.write(outlier_counts)
 
                 # Supprimer les valeurs aberrantes
-                
+                # Note: Vous avez indiqué que vous souhaitez les conserver pour l'instant
+                st.write("Pour l'instant nous gardons les valeurs aberrantes pour la conception d'un modèle de référence.")
 
-                st.write("Pour l'instant nous gardons les valeur aberantes pour la conception de notre modele de reference")
                 st.header("Analyse Exploratoire des Données")
 
                 st.subheader("Statistiques descriptives")
@@ -191,15 +192,12 @@ def main():
                     fig_bad = px.histogram(data, x='LOAN', title='Distribution de LOAN')
                     st.plotly_chart(fig_bad)
                     comment_bad = (
-                    "La distribution de la variable LOAN est asymétrique à droite, "
-                    "indiquant une concentration élevée de prêts dans les gammes inférieures avec un pic entre 10k et 20k. "
-                    "Les valeurs s'étendent d'environ 5k à plus de 80k, mais les prêts au-delà de 60k sont très peu nombreux. "
-                    "Cette distribution peut indiquer que la majorité des clients optent pour des prêts de petites à moyennes sommes, "
-                    "car il est plus facile de prêter une petite somme à tout le monde. Cela facilite le remboursement, "
-                    "plutôt que de donner des montants importants et de douter de la solvabilité du client. En effet, plus le prêt est élevé, plus le risque associé au client est important. "
-                    "Cela est également logique en tenant compte des différents titres d'emploi et des raisons de contracter des prêts."
-                )
-
+                        "La distribution de la variable LOAN est asymétrique à droite, "
+                        "indiquant une concentration élevée de prêts dans les gammes inférieures avec un pic entre 10k et 20k. "
+                        "Les valeurs s'étendent d'environ 5k à plus de 80k, mais les prêts au-delà de 60k sont très peu nombreux. "
+                        "Cette distribution peut indiquer que la majorité des clients optent pour des prêts de petites à moyennes sommes, "
+                        "ce qui pourrait être dû à une politique de prudence face aux risques associés à de grands montants prêtés."
+                    )
                     st.write(f"Commentaire : {comment_bad}")
 
                 if 'MORTDUE' in selected_col:
@@ -213,6 +211,7 @@ def main():
                         "mais aussi pointer vers des risques significatifs liés aux rares montants élevés."
                     )
                     st.write(f"Commentaire : {comment_bad}")
+
                 if 'VALUE' in selected_col:
                     fig_bad = px.histogram(data, x='VALUE', title="Distribution de la Valeur de la propriété actuelle")
                     st.plotly_chart(fig_bad)
@@ -225,23 +224,26 @@ def main():
                         "être indicative de la stabilité financière globale des emprunteurs dans l'ensemble de données."
                     )
                     st.write(f"Commentaire : {comment_bad}")
+
                 if 'REASON' in selected_col:
                     fig_bad = px.histogram(data, x='REASON', title="Distribution de la Raison de la demande de prêt")
                     st.plotly_chart(fig_bad)
                     comment_bad = "Nous remarquons qu'il y a une forte demande de prêt pour des raisons de consolidation de dettes que pour une amélioration de l'habitat. Nous avons entre autres plus de 4000 individus contre 1500."
                     st.write(f"Commentaire : {comment_bad}")
+
                 if 'JOB' in selected_col:
                     fig_bad = px.histogram(data, x='JOB', title="Distribution du Type d'emploi")
                     st.plotly_chart(fig_bad)
                     comment_bad = (
                         "La catégorie 'Other' domine nettement la distribution, ce qui indique que la majorité des emprunteurs dans l'ensemble de données "
                         "ne rentrent pas dans les catégories d'emploi traditionnelles listées ou travaillent dans des secteurs variés. "
-                        "Les professions 'office', 'Mgr'  et 'ProfExe' (professionnels exécutifs) sont également bien représentées, "
+                        "Les professions 'office', 'Mgr' et 'ProfExe' (professionnels exécutifs) sont également bien représentées, "
                         "suggérant une présence significative d'individus ayant probablement un niveau de revenu et de stabilité financière plus élevé. "
                         "Les catégories 'Self' (indépendants) et 'Sales' sont moins représentées, ce qui pourrait indiquer des niveaux de revenus inférieurs ou "
                         "une stabilité d'emploi moindre comparativement aux autres groupes."
                     )
                     st.write(f"Commentaire : {comment_bad}")
+
                 if 'YOJ' in selected_col:
                     fig_bad = px.histogram(data, x='YOJ', title='Distribution de YOJ')
                     st.plotly_chart(fig_bad)
@@ -270,6 +272,7 @@ def main():
                         "avec une présence minoritaire d'emprunteurs ayant des incidents. Cela peut être interprété comme un signe de bonne santé financière globale."
                     )
                     st.write(f"Commentaire : {comment_bad}")
+
                 if 'CLAGE' in selected_col:
                     fig_bad = px.histogram(data, x='CLAGE', title="Distribution de CLAGE")
                     st.plotly_chart(fig_bad)
@@ -278,6 +281,7 @@ def main():
                         "avec un pic entre 100 et 200 mois. Cette ancienneté peut être favorable pour l'évaluation de leur crédibilité."
                     )
                     st.write(f"Commentaire : {comment_bad}")
+
                 if 'NINQ' in selected_col:
                     fig_bad = px.histogram(data, x='NINQ', title="Distribution de NINQ")
                     st.plotly_chart(fig_bad)
@@ -286,6 +290,7 @@ def main():
                         "ce qui suggère une activité de crédit modérée et potentiellement moins de risque de surendettement."
                     )
                     st.write(f"Commentaire : {comment_bad}")
+
                 if 'CLNO' in selected_col:
                     fig_bad = px.histogram(data, x='CLNO', title="Distribution de CLNO")
                     st.plotly_chart(fig_bad)
@@ -294,6 +299,7 @@ def main():
                         "Cela indique une gestion de crédit relativement diversifiée sans aller vers une prolifération excessive."
                     )
                     st.write(f"Commentaire : {comment_bad}")
+
                 if 'DEBTINC' in selected_col:
                     fig_bad = px.histogram(data, x='DEBTINC', title="Distribution de DEBTINC")
                     st.plotly_chart(fig_bad)
@@ -305,22 +311,126 @@ def main():
                     st.write(f"Commentaire : {comment_bad}")
 
                 st.subheader("Relations entre les variables (Bivarié)")
-                var1 = st.selectbox("Sélectionnez la première colonne", data.columns)
-                var2 = st.selectbox("Sélectionnez la deuxième colonne", data.columns)
-                if var1 and var2:
-                    if data[var1].dtype in ['int64', 'float64'] and data[var2].dtype == 'object':
-                        fig = px.box(data, x=var2, y=var1, title=f"Relation entre {var2} et {var1}")
-                    elif data[var1].dtype == 'object' and data[var2].dtype in ['int64', 'float64']:
-                        fig = px.box(data, x=var1, y=var2, title=f"Relation entre {var1} et {var2}")
-                    elif data[var1].dtype == 'object' and data[var2].dtype == 'object':
-                        fig = px.bar(data, x=var1, color=var2, title=f"Relation entre {var1} et {var2}")
-                    else:
-                        fig = px.scatter(data, x=var1, y=var2, title=f"Relation entre {var1} et {var2}", marginal_y="violin", marginal_x="box")
-                    st.plotly_chart(fig)
-                    comment_bi = st.text_area(f"Commentaire sur la relation entre {var1} et {var2}")
-                    st.write(f"Votre commentaire : {comment_bi}")
-        else:
-            st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
+
+                # Relation entre BAD et LOAN
+                fig_bad_loan = px.box(data, x='BAD', y='LOAN', title="Relation entre BAD et LOAN")
+                st.plotly_chart(fig_bad_loan)
+                comment_bad_loan = (
+                    "La relation entre BAD et LOAN montre que les prêts plus élevés "
+                    "sont associés à un risque plus élevé de défaut. On observe que les individus en défaut (En défaut) ont tendance "
+                    "à avoir des montants de prêt plus élevés comparativement aux individus conformes (Conforme)."
+                )
+                st.write(f"Commentaire : {comment_bad_loan}")
+
+                # Relation entre BAD et MORTDUE
+                fig_bad_mortdue = px.box(data, x='BAD', y='MORTDUE', title="Relation entre BAD et MORTDUE")
+                st.plotly_chart(fig_bad_mortdue)
+                comment_bad_mortdue = (
+                    "La relation entre BAD et MORTDUE montre que les montants dus sur les hypothèques "
+                    "sont plus élevés pour les individus en défaut. Cela pourrait indiquer une difficulté à gérer les obligations hypothécaires "
+                    "pour les personnes ayant des prêts en défaut."
+                )
+                st.write(f"Commentaire : {comment_bad_mortdue}")
+
+                # Relation entre BAD et VALUE
+                fig_bad_value = px.box(data, x='BAD', y='VALUE', title="Relation entre BAD et VALUE")
+                st.plotly_chart(fig_bad_value)
+                comment_bad_value = (
+                    "La relation entre BAD et VALUE montre que la valeur des propriétés "
+                    "est légèrement plus basse pour les individus en défaut. Cela peut refléter une corrélation entre la valeur des biens possédés "
+                    "et la capacité à rembourser les prêts."
+                )
+                st.write(f"Commentaire : {comment_bad_value}")
+
+                # Relation entre BAD et REASON
+                fig_bad_reason = px.bar(data, x='BAD', color='REASON', title="Relation entre BAD et REASON")
+                st.plotly_chart(fig_bad_reason)
+                comment_bad_reason = (
+                    "La relation entre BAD et REASON montre que la majorité des défauts de paiement "
+                    "sont liés à des prêts pour la consolidation de dettes (DebtCon), plutôt que pour l'amélioration de l'habitat (HomeImp)."
+                )
+                st.write(f"Commentaire : {comment_bad_reason}")
+
+                # Relation entre BAD et JOB
+                fig_bad_job = px.bar(data, x='BAD', color='JOB', title="Relation entre BAD et JOB")
+                st.plotly_chart(fig_bad_job)
+                comment_bad_job = (
+                    "La relation entre BAD et JOB montre que certaines catégories d'emplois "
+                    "sont plus susceptibles d'être en défaut que d'autres. Par exemple, les personnes dans des emplois de bureau (office) "
+                    "ou de gestion (Mgr) semblent avoir moins de défauts comparativement à d'autres catégories."
+                )
+                st.write(f"Commentaire : {comment_bad_job}")
+
+                # Relation entre BAD et YOJ
+                fig_bad_yoj = px.box(data, x='BAD', y='YOJ', title="Relation entre BAD et YOJ")
+                st.plotly_chart(fig_bad_yoj)
+                comment_bad_yoj = (
+                    "La relation entre BAD et YOJ (Years on Job) montre que les individus en défaut "
+                    "ont tendance à avoir une ancienneté moindre à leur emploi actuel. Cela pourrait indiquer une instabilité professionnelle "
+                    "comme un facteur de risque pour le défaut de paiement."
+                )
+                st.write(f"Commentaire : {comment_bad_yoj}")
+
+                # Relation entre BAD et DEROG
+                fig_bad_derog = px.box(data, x='BAD', y='DEROG', title="Relation entre BAD et DEROG")
+                st.plotly_chart(fig_bad_derog)
+                comment_bad_derog = (
+                    "La relation entre BAD et DEROG montre que les individus avec un plus grand nombre "
+                    "de rapports dérogatoires sont plus susceptibles d'être en défaut. Cela souligne l'importance de l'historique de crédit "
+                    "dans l'évaluation du risque de défaut."
+                )
+                st.write(f"Commentaire : {comment_bad_derog}")
+
+                # Relation entre BAD et DELINQ
+                fig_bad_delinqu = px.box(data, x='BAD', y='DELINQ', title="Relation entre BAD et DELINQ")
+                st.plotly_chart(fig_bad_delinqu)
+                comment_bad_delinqu = (
+                    "La relation entre BAD et DELINQ montre que les individus ayant des délais de paiement "
+                    "plus fréquents sont également plus susceptibles d'être en défaut. Les retards de paiement sont donc un indicateur important "
+                    "du risque de défaut."
+                )
+                st.write(f"Commentaire : {comment_bad_delinqu}")
+
+                # Relation entre BAD et CLAGE
+                fig_bad_clage = px.box(data, x='BAD', y='CLAGE', title="Relation entre BAD et CLAGE")
+                st.plotly_chart(fig_bad_clage)
+                comment_bad_clage = (
+                    "La relation entre BAD et CLAGE montre que les individus avec des lignes de crédit plus anciennes "
+                    "sont moins susceptibles d'être en défaut. Une ancienneté plus grande des lignes de crédit peut indiquer une gestion plus stable "
+                    "et responsable du crédit."
+                )
+                st.write(f"Commentaire : {comment_bad_clage}")
+
+                # Relation entre BAD et NINQ
+                fig_bad_ninq = px.box(data, x='BAD', y='NINQ', title="Relation entre BAD et NINQ")
+                st.plotly_chart(fig_bad_ninq)
+                comment_bad_ninq = (
+                    "La relation entre BAD et NINQ montre que les individus avec un plus grand nombre "
+                    "de nouvelles demandes de crédit dans les six derniers mois sont plus susceptibles d'être en défaut. Cela pourrait indiquer "
+                    "un besoin urgent de crédit, augmentant ainsi le risque de défaut."
+                )
+                st.write(f"Commentaire : {comment_bad_ninq}")
+
+                # Relation entre BAD et CLNO
+                fig_bad_clno = px.box(data, x='BAD', y='CLNO', title="Relation entre BAD et CLNO")
+                st.plotly_chart(fig_bad_clno)
+                comment_bad_clno = (
+                    "La relation entre BAD et CLNO montre que les individus avec un nombre plus élevé de lignes de crédit "
+                    "sont plus susceptibles d'être en défaut. Une prolifération de lignes de crédit peut indiquer une gestion financière risquée."
+                )
+                st.write(f"Commentaire : {comment_bad_clno}")
+
+                # Relation entre BAD et DEBTINC
+                fig_bad_debtinc = px.box(data, x='BAD', y='DEBTINC', title="Relation entre BAD et DEBTINC")
+                st.plotly_chart(fig_bad_debtinc)
+                comment_bad_debtinc = (
+                    "La relation entre BAD et DEBTINC montre que les individus avec un ratio dette/revenu élevé "
+                    "sont plus susceptibles d'être en défaut. Un ratio dette/revenu élevé indique une charge financière importante par rapport aux revenus, "
+                    "augmentant ainsi le risque de défaut."
+                )
+                st.write(f"Commentaire : {comment_bad_debtinc}")
+            else:
+                st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
 
     elif choice == "Modélisation et évaluation":
         st.header("Modélisation et évaluation des modèles")
