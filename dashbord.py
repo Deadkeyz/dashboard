@@ -223,6 +223,18 @@ def main():
             
                 st.header("Analyse Exploratoire des Données")
             
+                colors = ['#80b784', '#668d68', '#4d734d', '#335a33']
+
+                # Fonction pour détecter les valeurs aberrantes
+                def detect_outliers(data, col):
+                    Q1 = data[col].quantile(0.25)
+                    Q3 = data[col].quantile(0.75)
+                    IQR = Q3 - Q1
+                    lower_bound = Q1 - 1.5 * IQR
+                    upper_bound = Q3 + 1.5 * IQR
+                    outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
+                    return outliers
+
                 st.subheader("Distribution des variables (Univarié)")
                 univar_comments = {
                     'BAD': "Nous remarquons qu'il y a beaucoup plus de personnes conformes que de personnes en défaut. Nous avons environ 5000 individus qui sont conformes et moins de 1500 qui sont en défaut.",
@@ -242,7 +254,13 @@ def main():
                 
                 for col, comment in univar_comments.items():
                     if col in data.columns:
-                        fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=['#80b784'])
+                        outliers = detect_outliers(data, col)
+                        fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=colors)
+                        fig.add_trace(go.Histogram(
+                            x=outliers[col],
+                            name='Outliers',
+                            marker=dict(color='red')
+                        ))
                         st.plotly_chart(fig)
                         st.write(f"Commentaire : {comment}")
                 
@@ -264,11 +282,18 @@ def main():
                 
                 for col, comment in bivar_comments.items():
                     if col in data.columns:
+                        outliers = detect_outliers(data, col)
                         if data[col].dtype in ['int64', 'float64']:
                             fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
-                            fig.update_traces(marker_color='#80b784')
+                            fig.update_traces(marker=dict(color='#80b784'))
+                            fig.add_trace(go.Box(
+                                y=outliers[col],
+                                x=outliers['BAD'],
+                                name='Outliers',
+                                marker=dict(color='red')
+                            ))
                         else:
-                            fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=['#80b784'])
+                            fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=colors)
                         st.plotly_chart(fig)
                         st.write(f"Commentaire : {comment}")
             else:
