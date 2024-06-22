@@ -413,7 +413,7 @@ def main():
                 cm = confusion_matrix(y_test, y_pred)
 
                 st.write(f"Accuracy: {accuracy}, F1 Score: {f1}")
-                cm_fig = px.imshow(cm, text_auto=True, color_continuous_scale=[(0, "#107d59"), (1, "#107d59")], title="Matrice de Confusion", template="plotly_white")
+                cm_fig = px.imshow(cm, text_auto=True, color_continuous_scale=[(0, "#102429"), (1, "#107d59")], title="Matrice de Confusion", template="plotly_white")
                 st.plotly_chart(cm_fig)
 
                 # Calcul des métriques
