@@ -77,7 +77,7 @@ def main():
             'city': ['Abidjan', 'Bouaké', 'Daloa', 'Korhogo', 'Yamoussoukro', 'San-Pédro', 'Man', 'Gagnoa'],
             'lat': [5.30966, 7.6899, 6.8774, 9.4591, 6.8276, 4.7500, 7.4125, 6.1319],
             'lon': [-4.01266, -5.0318, -6.4502, -5.6296, -5.2767, -6.6500, -7.5536, -5.9498],
-            'color': ['green', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange']
+            'color': ['red', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange']
         })
         
         fig = go.Figure()
@@ -99,7 +99,7 @@ def main():
         
         # Mise en page de la carte
         fig.update_layout(
-            title_text='Carte de la Côte d\'Ivoire',
+            title_text='Pays des concepteur du projet',
             showlegend=False,
             geo=dict(
                 scope='africa',
