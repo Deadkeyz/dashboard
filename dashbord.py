@@ -320,10 +320,30 @@ def main():
                             st.write(f"Commentaire : {comment}")
                         except Exception as e:
                             st.write(f"Error processing column {col}: {e}")
+                st.header("Impact des variables sur BAD")
+
+                if 'BAD' in data.columns:
+                    # Convertir 'BAD' en catégorie si nécessaire
+                    if data['BAD'].dtype not in ['int64', 'float64']:
+                        st.warning("La colonne 'BAD' doit être de type numérique. Conversion en cours...")
+                        data['BAD'] = pd.to_numeric(data['BAD'], errors='coerce')
+            
+                    # Sélectionner les colonnes numériques pour les box plots
+                    numeric_columns = data.select_dtypes(include=[np.number]).columns
+            
+                    # Create box plots for each numeric feature grouped by BAD
+                    figures = []
+                    for feature in numeric_columns:
+                        if feature != 'BAD':
+                            fig = px.box(data, x='BAD', y=feature, points="all", title=f"Impact de {feature} sur BAD", color='BAD')
+                            figures.append(fig)
+            
+                    # Display the plots in Streamlit
+                    for fig in figures:
+                        st.plotly_chart(fig)
             else:
                 st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
-            
-
+        
     elif choice == "Modélisation et évaluation":
         st.header("Modélisation et évaluation des modèles")
         if uploaded_file is not None:
@@ -569,6 +589,27 @@ def main():
                             st.write(f"Commentaire : {comment}")
                         except Exception as e:
                             st.write(f"Error processing column {col}: {e}")
+                st.header("Impact des variables sur BAD")
+
+                if 'BAD' in data.columns:
+                    # Convertir 'BAD' en catégorie si nécessaire
+                    if data['BAD'].dtype not in ['int64', 'float64']:
+                        st.warning("La colonne 'BAD' doit être de type numérique. Conversion en cours...")
+                        data['BAD'] = pd.to_numeric(data['BAD'], errors='coerce')
+            
+                    # Sélectionner les colonnes numériques pour les box plots
+                    numeric_columns = data.select_dtypes(include=[np.number]).columns
+            
+                    # Create box plots for each numeric feature grouped by BAD
+                    figures = []
+                    for feature in numeric_columns:
+                        if feature != 'BAD':
+                            fig = px.box(data, x='BAD', y=feature, points="all", title=f"Impact de {feature} sur BAD", color='BAD')
+                            figures.append(fig)
+            
+                    # Display the plots in Streamlit
+                    for fig in figures:
+                        st.plotly_chart(fig)
 
                 st.header("Modélisation et évaluation des modèles")
 
