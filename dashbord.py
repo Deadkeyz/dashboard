@@ -475,6 +475,97 @@ def main():
                 st.write(outlier_counts)
                 st.write("Données après suppression des valeurs aberrantes :")
                 st.write(data)
+                st.header("Analyse Exploratoire des Données")
+            
+                colors = ['#80b784', '#668d68', '#4d734d', '#335a33']
+
+                # Fonction pour détecter les valeurs aberrantes
+                def detect_outliers(data, col):
+                    Q1 = data[col].quantile(0.25)
+                    Q3 = data[col].quantile(0.75)
+                    IQR = Q3 - Q1
+                    lower_bound = Q1 - 1.5 * IQR
+                    upper_bound = Q3 + 1.5 * IQR
+                    outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
+                    return outliers
+
+                st.subheader("Distribution des variables (Univarié)")
+                univar_comments = {
+                    'BAD': "Nous remarquons qu'il y a beaucoup plus de personnes conformes que de personnes en défaut. Nous avons environ 5000 individus qui sont conformes et moins de 1500 qui sont en défaut.",
+                    'LOAN': "La distribution de la variable LOAN est asymétrique à droite, indiquant une concentration élevée de prêts dans les gammes inférieures avec un pic entre 10k et 20k. Les valeurs s'étendent d'environ 5k à plus de 80k, mais les prêts au-delà de 60k sont très peu nombreux. Cette distribution peut indiquer que la majorité des clients optent pour des prêts de petites à moyennes sommes, ce qui pourrait être dû à une politique de prudence face aux risques associés à de grands montants prêtés.",
+                    'MORTDUE': "La distribution est fortement concentrée autour de valeurs basses avec un pic marqué près de 50k, indiquant que la majorité des hypothèques dans cet ensemble ont des montants dus faibles. Bien que la distribution s'étende à des valeurs plus élevées, dépassant 350k, ces cas sont nettement moins fréquents. Cette caractéristique peut suggérer une moindre vulnérabilité globale au défaut sur ces hypothèques, mais aussi pointer vers des risques significatifs liés aux rares montants élevés.",
+                    'VALUE': "La distribution montre une forte concentration des valeurs autour de moins de 200k, avec un pic marqué près de 100k, suggérant que la majorité des propriétés ont une valeur relativement modeste. La distribution s'étend jusqu'à des valeurs supérieures, atteignant 800k, mais avec une fréquence nettement décroissante, indiquant que les propriétés de très haute valeur sont rares dans cet ensemble de données. Cette répartition des valeurs peut influencer la capacité des emprunteurs à obtenir des prêts plus élevés et pourrait être indicative de la stabilité financière globale des emprunteurs dans l'ensemble de données.",
+                    'REASON': "Nous remarquons qu'il y a une forte demande de prêt pour des raisons de consolidation de dettes que pour une amélioration de l'habitat. Nous avons entre autres plus de 4000 individus contre 1500.",
+                    'JOB': "La catégorie 'Other' domine nettement la distribution, ce qui indique que la majorité des emprunteurs dans l'ensemble de données ne rentrent pas dans les catégories d'emploi traditionnelles listées ou travaillent dans des secteurs variés. Les professions 'office', 'Mgr' et 'ProfExe' (professionnels exécutifs) sont également bien représentées, suggérant une présence significative d'individus ayant probablement un niveau de revenu et de stabilité financière plus élevé. Les catégories 'Self' (indépendants) et 'Sales' sont moins représentées, ce qui pourrait indiquer des niveaux de revenus inférieurs ou une stabilité d'emploi moindre comparativement aux autres groupes.",
+                    'YOJ': "La distribution des années sur le poste actuel montre un pic significatif pour les emprunteurs avec peu d'ancienneté, surtout entre 0 et 5 ans. Cela pourrait refléter une instabilité professionnelle pour une partie des emprunteurs, ce qui est un facteur à considérer dans l'évaluation du risque de crédit.",
+                    'DEROG': "La distribution montre que la majorité des emprunteurs n'ont pas de dérogations sur leur dossier de crédit. Les cas avec des dérogations sont très rares, signalant des exceptions plutôt que la norme. Cela suggère un profil de risque généralement faible pour la majorité des emprunteurs.",
+                    'DELINQ': "La distribution indique que la plupart des emprunteurs n'ont aucun retard de paiement, avec une présence minoritaire d'emprunteurs ayant des incidents. Cela peut être interprété comme un signe de bonne santé financière globale.",
+                    'CLAGE': "Le graphique montre que de nombreux emprunteurs possèdent des lignes de crédit bien établies, avec un pic entre 100 et 200 mois. Cette ancienneté peut être favorable pour l'évaluation de leur crédibilité.",
+                    'NINQ': "Cette variable montre que la majorité des emprunteurs ont peu ou pas de nouvelles enquêtes de crédit, ce qui suggère une activité de crédit modérée et potentiellement moins de risque de surendettement.",
+                    'CLNO': "La plupart des emprunteurs gèrent un nombre modéré de lignes de crédit, avec un pic notable entre 10 et 20. Cela indique une gestion de crédit relativement diversifiée sans aller vers une prolifération excessive.",
+                    'DEBTINC': "La distribution du ratio dette/revenu est extrêmement concentrée autour de faibles valeurs, montrant que la majorité des emprunteurs ont un faible endettement par rapport à leur revenu, ce qui est un indicateur positif pour la stabilité financière."
+                }
+                
+                for col, comment in univar_comments.items():
+                    if col in data.columns:
+                        try:
+                            outliers = detect_outliers(data, col)
+                            fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=colors)
+                            fig.add_trace(go.Histogram(
+                                x=outliers[col],
+                                name='Outliers',
+                                marker=dict(color='red')
+                            ))
+                            st.plotly_chart(fig)
+                            st.write(f"Commentaire : {comment}")
+                        except Exception as e:
+                            st.write(f"Error processing column {col}: {e}")
+                
+                st.subheader("Relations entre les variables (Bivarié)")
+
+                bivar_comments = {
+                    'LOAN': "La relation entre BAD et LOAN montre que les prêts plus élevés sont associés à un risque plus élevé de défaut. On observe que les individus en défaut (En défaut) ont tendance à avoir des montants de prêt plus élevés comparativement aux individus conformes (Conforme).",
+                    'MORTDUE': "La relation entre BAD et MORTDUE montre que les montants dus sur les hypothèques sont plus élevés pour les individus en défaut. Cela pourrait indiquer une difficulté à gérer les obligations hypothécaires pour les personnes ayant des prêts en défaut.",
+                    'VALUE': "La relation entre BAD et VALUE montre que la valeur des propriétés est légèrement plus basse pour les individus en défaut. Cela peut refléter une corrélation entre la valeur des biens possédés et la capacité à rembourser les prêts.",
+                    'REASON': "La relation entre BAD et REASON montre que la majorité des défauts de paiement sont liés à des prêts pour la consolidation de dettes (DebtCon), plutôt que pour l'amélioration de l'habitat (HomeImp).",
+                    'JOB': "La relation entre BAD et JOB montre que certaines catégories d'emplois sont plus susceptibles d'être en défaut que d'autres. Par exemple, les personnes dans des emplois de bureau (office) ou de gestion (Mgr) semblent avoir moins de défauts comparativement à d'autres catégories.",
+                    'YOJ': "La relation entre BAD et YOJ (Years on Job) montre que les individus en défaut ont tendance à avoir une ancienneté moindre à leur emploi actuel. Cela pourrait indiquer une instabilité professionnelle comme un facteur de risque pour le défaut de paiement.",
+                    'DEROG': "La relation entre BAD et DEROG montre que les individus avec un plus grand nombre de rapports dérogatoires sont plus susceptibles d'être en défaut. Cela souligne l'importance de l'historique de crédit dans l'évaluation du risque de défaut.",
+                    'DELINQ': "La relation entre BAD et DELINQ montre que les individus ayant des délais de paiement plus fréquents sont également plus susceptibles d'être en défaut. Les retards de paiement sont donc un indicateur important du risque de défaut.",
+                    'CLAGE': "La relation entre BAD et CLAGE montre que les individus avec des lignes de crédit plus anciennes sont moins susceptibles d'être en défaut. Une ancienneté plus grande des lignes de crédit peut indiquer une gestion plus stable et responsable du crédit.",
+                    'NINQ': "La relation entre BAD et NINQ montre que les individus avec un plus grand nombre de nouvelles demandes de crédit dans les six derniers mois sont plus susceptibles d'être en défaut. Cela pourrait indiquer un besoin urgent de crédit, augmentant ainsi le risque de défaut.",
+                    'CLNO': "La relation entre BAD et CLNO montre que les individus avec un nombre plus élevé de lignes de crédit sont plus susceptibles d'être en défaut. Une prolifération de lignes de crédit peut indiquer une gestion financière risquée.",
+                    'DEBTINC': "La relation entre BAD et DEBTINC montre que les individus avec un ratio dette/revenu élevé sont plus susceptibles d'être en défaut. Un ratio dette/revenu élevé indique une charge financière importante par rapport aux revenus, augmentant ainsi le risque de défaut."
+                }
+                
+                def detect_outliers(df, column):
+                    q1 = df[column].quantile(0.25)
+                    q3 = df[column].quantile(0.75)
+                    iqr = q3 - q1
+                    lower_bound = q1 - 1.5 * iqr
+                    upper_bound = q3 + 1.5 * iqr
+                    outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
+                    return outliers
+                
+                for col, comment in bivar_comments.items():
+                    if col in data.columns:
+                        try:
+                            if data[col].dtype in ['int64', 'float64']:
+                                outliers = detect_outliers(data, col)
+                                fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
+                                fig.update_traces(marker=dict(color='#80b784'))
+                                fig.add_trace(go.Box(
+                                    y=outliers[col],
+                                    x=outliers['BAD'],
+                                    name='Outliers',
+                                    marker=dict(color='red')
+                                ))
+                            else:
+                                fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=px.colors.qualitative.Set1)
+                            st.plotly_chart(fig)
+                            st.write(f"Commentaire : {comment}")
+                        except Exception as e:
+                            st.write(f"Error processing column {col}: {e}")
 
                 st.header("Modélisation et évaluation des modèles")
 
