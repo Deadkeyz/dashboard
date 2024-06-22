@@ -581,6 +581,12 @@ def main():
                 results_df = pd.DataFrame(results).drop(columns=['Recall', 'Precision', 'Meilleurs hyperparamètres'])
                 st.write(results_df)
 
+                # Plotting comparison metrics
+                st.header("Comparaison des modèles")
+                fig = px.bar(results_df, x="Modèle", y=["Accuracy", "F1 Score"], barmode='group', title="Comparaison des modèles")
+                st.plotly_chart(fig)
+
+                # Displaying detailed metrics for each model
                 for result in results:
                     st.write(f"### {result['Modèle']}")
                     st.write(f"Meilleurs hyperparamètres : {result['Meilleurs hyperparamètres']}")
