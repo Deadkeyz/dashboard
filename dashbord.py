@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.discriminant_analysis import StandardScaler
 import streamlit as st
 import pandas as pd
@@ -7,11 +8,11 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_recall_curve
-from sklearn.preprocessing import OneHotEncoder, RobustScaler
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-
+from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
 # Titre du dashboard
 st.set_page_config(page_title="Projet Data Science", layout="wide")
 
@@ -20,6 +21,17 @@ st.set_page_config(page_title="Projet Data Science", layout="wide")
 def load_data(file):
     data = pd.read_csv(file)
     return data
+
+def apply_scaler(data, scaler_choice):
+    if scaler_choice == "StandardScaler":
+        scaler = StandardScaler()
+    elif scaler_choice == "RobustScaler":
+        scaler = RobustScaler()
+    elif scaler_choice == "MinMaxScaler":
+        scaler = MinMaxScaler()
+    scaled_data = scaler.fit_transform(data.select_dtypes(include=[np.number]))
+    return pd.DataFrame(scaled_data, columns=data.select_dtypes(include=[np.number]).columns)
+
 st.sidebar.image("logo.png", use_column_width=True)
 
 # Uploader le fichier CSV dans la sidebar
@@ -28,7 +40,7 @@ uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type="csv"
 # Affichage de l'image du logo dans l'en-tête de la barre latérale
 
 def main():
-    menu = ["Accueil", "Compréhension des données", "Préparation des données", "Modélisation et évaluation"]
+    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Accueil":
@@ -39,7 +51,7 @@ def main():
             de les préparer, de construire des modèles de prédiction et d'évaluer leurs performances. 
             Dans ce projet, nous allons explorer et analyser un ensemble de données de 5960 observations avec 13 variables, afin de prédire la probabilité de défaut de crédit. Les données contiennent des informations sur les prêts, les hypothèques, les emplois, et d'autres variables financières et démographiques.        
         """)
-        st.image("Franck-Vermet.png", use_column_width=True)
+        st.image("Franck.png", use_column_width=True)
     elif choice == "Compréhension des données":
         if uploaded_file is not None:
                 data = load_data(uploaded_file)
@@ -67,8 +79,6 @@ def main():
                     - **DEBTINC** : Ratio dette/revenu
                  
         """)
-
-                st.header("Préparation des données")
                 st.write("Vérification des valeurs manquantes et des valeurs aberrantes")
                 missing_data = data.isnull().sum()
                 st.write(missing_data[missing_data > 0])
@@ -255,119 +265,100 @@ def main():
                st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
 
 
-    elif choice == "Préparation des données":
+    elif choice == "Modélisation et évaluation":
+        st.header("Modélisation et évaluation des modèles")
         if uploaded_file is not None:
             data = load_data(uploaded_file)
+
             if 'BAD' in data.columns and data['BAD'].dtype in ['int64', 'float64']:
+                # Transformation des données
                 bins = [-1, 0, 1]  # Ajustez ces seuils selon vos besoins
                 labels = ['Conforme', 'En défaut']
                 data['BAD'] = pd.cut(data['BAD'], bins=bins, labels=labels, right=True)
-                data['BAD'] = data['BAD'].astype(str)
-                data['REASON'].fillna(data['REASON'].mode()[0], inplace=True)
-                data['JOB'].fillna(data['JOB'].mode()[0], inplace=True)
-                data['MORTDUE'].fillna(data['MORTDUE'].median(), inplace=True)
-                data['VALUE'].fillna(data['VALUE'].median(), inplace=True)
-                data['YOJ'].fillna(data['YOJ'].median(), inplace=True)
-                data['DEROG'].fillna(data['DEROG'].median(), inplace=True)
-                data['DELINQ'].fillna(data['DELINQ'].median(), inplace=True)
-                data['CLAGE'].fillna(data['CLAGE'].median(), inplace=True)
-                data['NINQ'].fillna(data['NINQ'].median(), inplace=True)
-                data['CLNO'].fillna(data['CLNO'].median(), inplace=True)
-                data['DEBTINC'].fillna(data['DEBTINC'].median(), inplace=True)
-            
-            
-        else:
-            st.warning("Veuillez uploader un fichier CSV pour analyser les données.")
 
-    elif choice == "Modélisation et évaluation":
-        if uploaded_file is not None:
-            data = load_data(uploaded_file)
-            data['REASON'].fillna(data['REASON'].mode()[0], inplace=True)
-            data['JOB'].fillna(data['JOB'].mode()[0], inplace=True)
-            data['MORTDUE'].fillna(data['MORTDUE'].median(), inplace=True)
-            data['VALUE'].fillna(data['VALUE'].median(), inplace=True)
-            data['YOJ'].fillna(data['YOJ'].median(), inplace=True)
-            data['DEROG'].fillna(data['DEROG'].median(), inplace=True)
-            data['DELINQ'].fillna(data['DELINQ'].median(), inplace=True)
-            data['CLAGE'].fillna(data['CLAGE'].median(), inplace=True)
-            data['NINQ'].fillna(data['NINQ'].median(), inplace=True)
-            data['CLNO'].fillna(data['CLNO'].median(), inplace=True)
-            data['DEBTINC'].fillna(data['DEBTINC'].median(), inplace=True)
-            st.header("Modélisation")
-            target_column = st.selectbox("Sélectionnez la colonne cible", data.columns)
-            X = data.drop(columns=[target_column])
-            y = data[target_column]
+                # Prétraitement des variables
+                for col in ['REASON', 'JOB', 'MORTDUE', 'VALUE', 'YOJ', 'DEROG', 'DELINQ', 'CLAGE', 'NINQ', 'CLNO', 'DEBTINC']:
+                    if data[col].dtype in ['float64', 'int64']:
+                        data[col].fillna(data[col].median(), inplace=True)
+                    else:
+                        data[col].fillna(data[col].mode()[0], inplace=True)
 
-            numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
-            categorical_features = X.select_dtypes(include=['object']).columns
+                columns_to_exclude = st.multiselect("Sélectionnez les variables à exclure", options=data.columns)
+                data = data.drop(columns=columns_to_exclude)
+                scaler_choice = st.selectbox("Choisissez le type de standardisation", ["StandardScaler", "RobustScaler", "MinMaxScaler"])
+                data_scaled = apply_scaler(data, scaler_choice)
 
-            numeric_transformer = Pipeline(steps=[
-                ('imputer', SimpleImputer(strategy='median')),
-                ('scaler', StandardScaler())
-            ])
+                # Sélection de la colonne cible et des données
+                target_column = st.selectbox("Sélectionnez la colonne cible", data.columns)
+                X = data.drop(columns=[target_column])
+                y = data[target_column]
 
-            categorical_transformer = Pipeline(steps=[
-                ('imputer', SimpleImputer(strategy='most_frequent')),
-                ('onehot', OneHotEncoder(drop='first'))
-            ])
+                # Configuration des pipelines pour les transformations numériques et catégoriques
+                numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
+                categorical_features = X.select_dtypes(include=['object']).columns
 
-            preprocessor = ColumnTransformer(
-                transformers=[
-                    ('num', numeric_transformer, numeric_features),
-                    ('cat', categorical_transformer, categorical_features)
+                numeric_transformer = Pipeline(steps=[
+                    ('imputer', SimpleImputer(strategy='median')),
+                    ('scaler', StandardScaler())  # ou utilisez scaler_choice si vous voulez varier le scaler
                 ])
 
-            model_choice = st.selectbox("Choisissez le modèle", ["Régression Logistique", "Arbre de Décision"])
+                categorical_transformer = Pipeline(steps=[
+                    ('imputer', SimpleImputer(strategy='most_frequent')),
+                    ('onehot', OneHotEncoder(drop='first'))
+                ])
 
-            if model_choice == "Régression Logistique":
-                model = LogisticRegression(max_iter=1000)
-                param_grid = {
-                    'classifier__C': [0.1, 1.0, 10],
-                    'classifier__solver': ['liblinear', 'saga']
-                }
+                preprocessor = ColumnTransformer(
+                    transformers=[
+                        ('num', numeric_transformer, numeric_features),
+                        ('cat', categorical_transformer, categorical_features)
+                    ])
+
+                # Choix et configuration du modèle
+                model_choice = st.selectbox("Choisissez le modèle", ["Régression Logistique", "Arbre de Décision"])
+                if model_choice == "Régression Logistique":
+                    model = LogisticRegression(max_iter=1000)
+                    param_grid = {
+                        'classifier__C': [0.1, 1.0, 10],
+                        'classifier__solver': ['liblinear', 'saga']
+                    }
+                else:
+                    model = DecisionTreeClassifier()
+                    param_grid = {
+                        'classifier__max_depth': [5, 10, 20],
+                        'classifier__min_samples_split': [2, 10, 20]
+                    }
+
+                clf = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', model)])
+
+                # Division des données et entrainement
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+                grid_search = GridSearchCV(clf, param_grid, cv=5, scoring='f1_weighted')
+                grid_search.fit(X_train, y_train)
+                y_pred = grid_search.predict(X_test)
+
+                # Évaluation du modèle
+                accuracy = accuracy_score(y_test, y_pred)
+                f1 = f1_score(y_test, y_pred, average='weighted', pos_label='En défaut')  # Spécifiez pos_label explicitement
+                cm = confusion_matrix(y_test, y_pred)
+
+                st.write(f"Accuracy: {accuracy}")
+                st.write(f"F1 Score: {f1}")
+                st.write(f"Meilleurs hyperparamètres : {grid_search.best_params_}")
+
+                fig = px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion")
+                st.plotly_chart(fig)
+                comment_bi = (
+                    "Les variables DELINQ, DEROG, et DEBTINC sont essentielles pour le modèle car elles montrent directement la capacité "
+                    "et le comportement de paiement de l'emprunteur, influençant fortement la prédiction du risque de défaut. "
+                    "Les variables comme NINQ et CLNO, moins directement liées au risque de défaut, pourraient être omises pour simplifier le modèle. "
+                    "YOJ et CLAGE offrent des contextes utiles sur la stabilité de l'emprunteur mais doivent être utilisées judicieusement."
+                )
+                st.write(f"Votre commentaire : {comment_bi}")
             else:
-                model = DecisionTreeClassifier()
-                param_grid = {
-                    'classifier__max_depth': [5, 10, 20],
-                    'classifier__min_samples_split': [2, 10, 20]
-                }
-
-            clf = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', model)])
-
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-            grid_search = GridSearchCV(clf, param_grid, cv=5, scoring='f1_weighted')
-            grid_search.fit(X_train, y_train)
-            y_pred = grid_search.predict(X_test)
-
-            st.header("Évaluation du modèle")
-            accuracy = accuracy_score(y_test, y_pred)
-            f1 = f1_score(y_test, y_pred, average='weighted')
-            cm = confusion_matrix(y_test, y_pred)
-
-            st.write(f"Accuracy: {accuracy}")
-            st.write(f"F1 Score: {f1}")
-            st.write(f"Meilleurs hyperparamètres : {grid_search.best_params_}")
-
-            fig = px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion")
-            st.plotly_chart(fig)
-
-            # Tracer les courbes de précision-rappel pour tous les modèles évalués
-            st.header("Courbes de précision-rappel")
-
-            fig = go.Figure()
-            for mean_score, params in zip(grid_search.cv_results_['mean_test_score'], grid_search.cv_results_['params']):
-                clf.set_params(**params)
-                clf.fit(X_train, y_train)
-                y_prob = clf.predict_proba(X_test)[:, 1]
-                precision, recall, _ = precision_recall_curve(y_test, y_prob)
-                fig.add_trace(go.Scatter(x=recall, y=precision, mode='lines', name=str(params)))
-
-            fig.update_layout(title="Courbes de précision-rappel", xaxis_title="Recall", yaxis_title="Precision")
-            st.plotly_chart(fig)
+                st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
         else:
             st.warning("Veuillez uploader un fichier CSV pour modéliser les données.")
-    
+        
 
 
 if __name__ == '__main__':
