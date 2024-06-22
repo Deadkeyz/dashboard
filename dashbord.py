@@ -17,13 +17,12 @@ import plotly.graph_objects as go
 # Titre du dashboard
 st.set_page_config(page_title="Projet Data Science", layout="wide")
 
-# Définir le CSS pour changer la couleur de l'arrière-plan et de la barre latérale
 background_css = """
 <style>
 /* Appliquer la couleur de l'arrière-plan à toute la page */
 [data-testid="stAppViewContainer"] {
     background-color: #effbf0;
-    background: url(bg.jpg);
+    background: url('bg.jpg');
     background-size: cover;
     background-repeat: no-repeat;
 }
