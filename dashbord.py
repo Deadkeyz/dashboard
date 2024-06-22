@@ -12,6 +12,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler, RobustScaler, M
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
+import plotly.graph_objects as go
 
 # Titre du dashboard
 st.set_page_config(page_title="Projet Data Science", layout="wide")
