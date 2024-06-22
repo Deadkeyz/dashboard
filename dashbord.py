@@ -39,7 +39,7 @@ uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type="csv"
 # Affichage de l'image du logo dans l'en-tête de la barre latérale
 
 def main():
-    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation", "Amélioration du Modèle"]
+    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation", "Amélioration des Modèles"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Accueil":
@@ -173,7 +173,7 @@ def main():
                 # Supprimer les valeurs aberrantes
                 
 
-                st.write("Pour l'instant nous gardons les valeur aberantes pour la conception dun modele de reference ?")
+                st.write("Pour l'instant nous gardons les valeur aberantes pour la conception de notre modele de reference")
                 st.header("Analyse Exploratoire des Données")
 
                 st.subheader("Statistiques descriptives")
@@ -191,12 +191,15 @@ def main():
                     fig_bad = px.histogram(data, x='LOAN', title='Distribution de LOAN')
                     st.plotly_chart(fig_bad)
                     comment_bad = (
-                        "La distribution de la variable LOAN est asymétrique à droite, "
-                        "indiquant une concentration élevée de prêts dans les gammes inférieures avec un pic entre 10k et 20k. "
-                        "Les valeurs s'étendent d'environ 5k à plus de 80k, mais les prêts au-delà de 60k sont très peu nombreux. "
-                        "Cette distribution peut indiquer que la majorité des clients optent pour des prêts de petites à moyennes sommes, "
-                        "ce qui pourrait être dû à une politique de prudence face aux risques associés à de grands montants prêtés."
-                    )
+                    "La distribution de la variable LOAN est asymétrique à droite, "
+                    "indiquant une concentration élevée de prêts dans les gammes inférieures avec un pic entre 10k et 20k. "
+                    "Les valeurs s'étendent d'environ 5k à plus de 80k, mais les prêts au-delà de 60k sont très peu nombreux. "
+                    "Cette distribution peut indiquer que la majorité des clients optent pour des prêts de petites à moyennes sommes, "
+                    "car il est plus facile de prêter une petite somme à tout le monde. Cela facilite le remboursement, "
+                    "plutôt que de donner des montants importants et de douter de la solvabilité du client. En effet, plus le prêt est élevé, plus le risque associé au client est important. "
+                    "Cela est également logique en tenant compte des différents titres d'emploi et des raisons de contracter des prêts."
+                )
+
                     st.write(f"Commentaire : {comment_bad}")
 
                 if 'MORTDUE' in selected_col:
