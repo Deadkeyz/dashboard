@@ -29,6 +29,11 @@ background_css = """
 .main {
     background-color: #ADD8E6;
 }
+
+/* Appliquer la couleur de l'arrière-plan à la barre latérale */
+[data-testid="stSidebar"] {
+    background-color: #effbf0;
+}
 </style>
 """
 
