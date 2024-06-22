@@ -7,12 +7,13 @@ import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_recall_curve
+from sklearn.metrics import accuracy_score, auc, f1_score, confusion_matrix, precision_recall_curve, roc_curve
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
+
 # Titre du dashboard
 st.set_page_config(page_title="Projet Data Science", layout="wide")
 
@@ -340,11 +341,6 @@ def main():
                 accuracy = accuracy_score(y_test, y_pred)
                 f1 = f1_score(y_test, y_pred, average='weighted', pos_label='En défaut')  # Spécifiez pos_label explicitement
                 cm = confusion_matrix(y_test, y_pred)
-
-                st.write(f"Accuracy: {accuracy}")
-                st.write(f"F1 Score: {f1}")
-                st.write(f"Meilleurs hyperparamètres : {grid_search.best_params_}")
-
                 fig = px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion")
                 st.plotly_chart(fig)
                 comment_bi = (
@@ -354,6 +350,55 @@ def main():
                     "YOJ et CLAGE offrent des contextes utiles sur la stabilité de l'emprunteur mais doivent être utilisées judicieusement."
                 )
                 st.write(f"Votre commentaire : {comment_bi}")
+
+                if model_choice == "Régression Logistique":
+                    model = LogisticRegression(max_iter=1000)
+                    param_grid = {
+                        'classifier__C': np.logspace(-4, 4, 20),  # étendue plus large pour C
+                        'classifier__solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
+                        'classifier__penalty': ['l1', 'l2', 'elasticnet', 'none']
+                    }
+                else:
+                    model = DecisionTreeClassifier()
+                    param_grid = {
+                        'classifier__max_depth': [5, 10, 20],
+                        'classifier__min_samples_split': [2, 10, 20]
+                    }
+
+                clf = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', model)])
+
+                # Division des données et entrainement du modèle
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+                grid_search = GridSearchCV(clf, param_grid, cv=5, scoring='f1_weighted',verbose=1)
+                grid_search.fit(X_train, y_train)
+                y_pred = grid_search.predict(X_test)
+                y_prob = grid_search.predict_proba(X_test)[:, 1]  # Assurez-vous que cela retourne les probabilités pour la classe positive
+
+                # Calcul des métriques
+                accuracy = accuracy_score(y_test, y_pred)
+                f1 = f1_score(y_test, y_pred, average='weighted', pos_label='En défaut')
+
+                # Tracé de la courbe ROC
+                fpr, tpr, _ = roc_curve(y_test, y_prob, pos_label='En défaut')
+                roc_auc = auc(fpr, tpr)
+                fig_roc = go.Figure(data=go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC curve (AUC = {roc_auc:.2f})'))
+                fig_roc.update_layout(title="Courbe ROC",
+                                    xaxis_title='Taux de Faux Positifs',
+                                    yaxis_title='Taux de Vrais Positifs')
+
+                # Tracé de la courbe de précision-rappel
+                precision, recall, _ = precision_recall_curve(y_test, y_prob, pos_label='En défaut')
+                fig_pr = go.Figure(data=go.Scatter(x=recall, y=precision, mode='lines'))
+                fig_pr.update_layout(title="Courbe de Précision-Rappel",
+                                    xaxis_title='Rappel',
+                                    yaxis_title='Précision')
+
+                # Affichage des résultats et des graphiques dans Streamlit
+                st.write(f"Accuracy: {accuracy}")
+                st.write(f"F1 Score: {f1}")
+                st.write("Meilleurs hyperparamètres :", grid_search.best_params_)
+                st.plotly_chart(fig_roc)
+                st.plotly_chart(fig_pr)
             else:
                 st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
         else:
