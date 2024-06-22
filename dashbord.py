@@ -21,7 +21,7 @@ background_css = """
 <style>
 /* Appliquer la couleur de l'arrière-plan à toute la page */
 [data-testid="stAppViewContainer"] {
-    background-color: #bff23d,
+    background-color: #77b07f,
     background: url(https://giphy.com/embed/crwwGNqIMccLXpD10F);
         background-size: cover;
         background-repeat: no-repeat;;
@@ -29,7 +29,7 @@ background_css = """
 
 /* Appliquer la couleur de l'arrière-plan à l'élément principal */
 .main {
-    background-color: #bff23d;
+    background-color: #77b07f;
 }
 </style>
 """
