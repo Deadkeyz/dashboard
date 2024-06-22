@@ -109,7 +109,7 @@ def main():
                 scope='africa',
                 projection_type='natural earth',
                 showland=True,
-                landcolor='green',
+                landcolor='#effbf0',
                 showocean=True,
                 oceancolor='lightblue',
                 lakecolor='lightblue',
