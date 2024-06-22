@@ -20,7 +20,7 @@ st.set_page_config(page_title="Projet Data Science", layout="wide")
 background_css = """
 <style>
 /* Appliquer la couleur de l'arrière-plan à toute la page */
-[data-testid="stAppViewContainer"] {
+.main {
     background: url('bg.jpg');
     background-size: cover;
     background-repeat: no-repeat;
