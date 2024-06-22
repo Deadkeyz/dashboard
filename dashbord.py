@@ -6,7 +6,9 @@ import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, auc, f1_score, confusion_matrix, precision_recall_curve, roc_curve
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, auc
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, RobustScaler, MinMaxScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -36,10 +38,8 @@ st.sidebar.image("logo.png", use_column_width=True)
 # Uploader le fichier CSV dans la sidebar
 uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type="csv")
 
-# Affichage de l'image du logo dans l'en-tête de la barre latérale
-
 def main():
-    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation", "Amélioration du Modèle"]
+    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation", "Amélioration du Modèle", "Conclusion"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Accueil":
@@ -239,7 +239,6 @@ def main():
                 labels = ['Conforme', 'En défaut']
                 data['BAD'] = pd.cut(data['BAD'], bins=bins, labels=labels, right=True)
                 
-                
                 # Prétraitement des variables
                 for col in ['REASON', 'JOB', 'MORTDUE', 'VALUE', 'YOJ', 'DEROG', 'DELINQ', 'CLAGE', 'NINQ', 'CLNO', 'DEBTINC']:
                     if data[col].dtype in ['float64', 'int64']:
@@ -277,19 +276,31 @@ def main():
                         ('cat', categorical_transformer, categorical_features)
                     ])
 
-                # Choix et configuration du modèle
-                model_choice = st.selectbox("Choisissez le modèle", ["Régression Logistique", "Arbre de Décision"])
+                # Choix et configuration des modèles
+                model_choice = st.selectbox("Choisissez le modèle", ["Régression Logistique", "Arbre de Décision", "SVM", "Random Forest"])
                 if model_choice == "Régression Logistique":
                     model = LogisticRegression(max_iter=1000)
                     param_grid = {
                         'classifier__C': [0.1, 1.0, 10],
                         'classifier__solver': ['liblinear', 'saga']
                     }
-                else:
+                elif model_choice == "Arbre de Décision":
                     model = DecisionTreeClassifier()
                     param_grid = {
                         'classifier__max_depth': [5, 10, 20],
                         'classifier__min_samples_split': [2, 10, 20]
+                    }
+                elif model_choice == "SVM":
+                    model = SVC(probability=True)
+                    param_grid = {
+                        'classifier__C': [0.1, 1.0, 10],
+                        'classifier__kernel': ['linear', 'rbf']
+                    }
+                else:
+                    model = RandomForestClassifier()
+                    param_grid = {
+                        'classifier__n_estimators': [50, 100, 200],
+                        'classifier__max_depth': [5, 10, 20]
                     }
 
                 clf = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', model)])
@@ -305,29 +316,21 @@ def main():
                 accuracy = accuracy_score(y_test, y_pred)
                 f1 = f1_score(y_test, y_pred, average='weighted', pos_label='En défaut')  # Spécifiez pos_label explicitement
                 cm = confusion_matrix(y_test, y_pred)
-                fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion")
-                st.plotly_chart(fig_cm)
+
+                st.write(f"Accuracy: {accuracy}, F1 Score: {f1}")
+                st.plotly_chart(px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion"))
 
                 # Calcul des métriques
                 fpr, tpr, _ = roc_curve(y_test, y_prob, pos_label='En défaut')
                 roc_auc = auc(fpr, tpr)
-                fig_roc = go.Figure(data=go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC curve (AUC = {roc_auc:.2f})'))
-                fig_roc.update_layout(title="Courbe ROC",
-                                      xaxis_title='Taux de Faux Positifs',
-                                      yaxis_title='Taux de Vrais Positifs')
+                roc_fig = px.area(x=fpr, y=tpr, title=f'Courbe ROC (AUC = {roc_auc:.2f})', labels=dict(x='Taux de Faux Positifs', y='Taux de Vrais Positifs'))
+                st.plotly_chart(roc_fig)
 
                 precision, recall, _ = precision_recall_curve(y_test, y_prob, pos_label='En défaut')
-                fig_pr = go.Figure(data=go.Scatter(x=recall, y=precision, mode='lines'))
-                fig_pr.update_layout(title="Courbe de Précision-Rappel",
-                                     xaxis_title='Rappel',
-                                     yaxis_title='Précision')
+                pr_fig = px.area(x=recall, y=precision, title='Courbe de Précision-Rappel', labels=dict(x='Rappel', y='Précision'))
+                st.plotly_chart(pr_fig)
 
-                # Affichage des résultats et des graphiques dans Streamlit
-                st.write(f"Accuracy: {accuracy}")
-                st.write(f"F1 Score: {f1}")
                 st.write("Meilleurs hyperparamètres :", grid_search.best_params_)
-                st.plotly_chart(fig_roc)
-                st.plotly_chart(fig_pr)
             else:
                 st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
         else:
@@ -414,24 +417,36 @@ def main():
                         ('cat', categorical_transformer, categorical_features)
                     ])
 
-                # Choix et configuration du modèle
-                model_choice = st.selectbox("Choisissez le modèle", ["Régression Logistique", "Arbre de Décision"])
+                # Choix et configuration des modèles
+                model_choice = st.selectbox("Choisissez le modèle", ["Régression Logistique", "Arbre de Décision", "SVM", "Random Forest"])
                 if model_choice == "Régression Logistique":
                     model = LogisticRegression(max_iter=1000)
                     param_grid = {
                         'classifier__C': [0.1, 1.0, 10],
                         'classifier__solver': ['liblinear', 'saga']
                     }
-                else:
+                elif model_choice == "Arbre de Décision":
                     model = DecisionTreeClassifier()
                     param_grid = {
                         'classifier__max_depth': [5, 10, 20],
                         'classifier__min_samples_split': [2, 10, 20]
                     }
+                elif model_choice == "SVM":
+                    model = SVC(probability=True)
+                    param_grid = {
+                        'classifier__C': [0.1, 1.0, 10],
+                        'classifier__kernel': ['linear', 'rbf']
+                    }
+                else:
+                    model = RandomForestClassifier()
+                    param_grid = {
+                        'classifier__n_estimators': [50, 100, 200],
+                        'classifier__max_depth': [5, 10, 20]
+                    }
 
                 clf = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', model)])
 
-                # Division des données et entraînement
+                # Division des données et entrainement
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
                 grid_search = GridSearchCV(clf, param_grid, cv=5, scoring='f1_weighted')
                 grid_search.fit(X_train, y_train)
@@ -442,29 +457,135 @@ def main():
                 accuracy = accuracy_score(y_test, y_pred)
                 f1 = f1_score(y_test, y_pred, average='weighted', pos_label='En défaut')  # Spécifiez pos_label explicitement
                 cm = confusion_matrix(y_test, y_pred)
-                fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion")
-                st.plotly_chart(fig_cm)
+
+                st.write(f"Accuracy: {accuracy}, F1 Score: {f1}")
+                st.plotly_chart(px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion"))
 
                 # Calcul des métriques
                 fpr, tpr, _ = roc_curve(y_test, y_prob, pos_label='En défaut')
                 roc_auc = auc(fpr, tpr)
-                fig_roc = go.Figure(data=go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC curve (AUC = {roc_auc:.2f})'))
-                fig_roc.update_layout(title="Courbe ROC",
-                                    xaxis_title='Taux de Faux Positifs',
-                                    yaxis_title='Taux de Vrais Positifs')
+                roc_fig = px.area(x=fpr, y=tpr, title=f'Courbe ROC (AUC = {roc_auc:.2f})', labels=dict(x='Taux de Faux Positifs', y='Taux de Vrais Positifs'))
+                st.plotly_chart(roc_fig)
 
                 precision, recall, _ = precision_recall_curve(y_test, y_prob, pos_label='En défaut')
-                fig_pr = go.Figure(data=go.Scatter(x=recall, y=precision, mode='lines'))
-                fig_pr.update_layout(title="Courbe de Précision-Rappel",
-                                    xaxis_title='Rappel',
-                                    yaxis_title='Précision')
+                pr_fig = px.area(x=recall, y=precision, title='Courbe de Précision-Rappel', labels=dict(x='Rappel', y='Précision'))
+                st.plotly_chart(pr_fig)
 
-                # Affichage des résultats et des graphiques dans Streamlit
-                st.write(f"Accuracy: {accuracy}")
-                st.write(f"F1 Score: {f1}")
                 st.write("Meilleurs hyperparamètres :", grid_search.best_params_)
-                st.plotly_chart(fig_roc)
-                st.plotly_chart(fig_pr)
+            else:
+                st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
+        else:
+            st.warning("Veuillez uploader un fichier CSV pour modéliser les données.")
+    
+    elif choice == "Conclusion":
+        st.header("Conclusion et Comparaison des Modèles")
+        if uploaded_file is not None:
+            data = load_data(uploaded_file)
+            
+            # Vérifiez que la colonne 'BAD' est présente et de type numérique
+            if 'BAD' in data.columns and data['BAD'].dtype in ['int64', 'float64']:
+                # Transformation des données
+                bins = [-1, 0, 1]  # Ajustez ces seuils selon vos besoins
+                labels = ['Conforme', 'En défaut']
+                data['BAD'] = pd.cut(data['BAD'], bins=bins, labels=labels, right=True)
+
+                # Prétraitement des variables
+                for col in ['REASON', 'JOB', 'MORTDUE', 'VALUE', 'YOJ', 'DEROG', 'DELINQ', 'CLAGE', 'NINQ', 'CLNO', 'DEBTINC']:
+                    if data[col].dtype in ['float64', 'int64']:
+                        data[col].fillna(data[col].median(), inplace=True)
+                    else:
+                        data[col].fillna(data[col].mode()[0], inplace=True)
+
+                columns_to_exclude = st.multiselect("Sélectionnez les variables à exclure", options=data.columns)
+                data = data.drop(columns=columns_to_exclude)
+                scaler_choice = st.selectbox("Choisissez le type de standardisation", ["StandardScaler", "RobustScaler", "MinMaxScaler"])
+                data_scaled = apply_scaler(data, scaler_choice)
+
+                # Sélection de la colonne cible et des données
+                target_column = st.selectbox("Sélectionnez la colonne cible", data.columns)
+                X = data.drop(columns=[target_column])
+                y = data[target_column]
+
+                # Configuration des pipelines pour les transformations numériques et catégoriques
+                numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
+                categorical_features = X.select_dtypes(include=['object']).columns
+
+                numeric_transformer = Pipeline(steps=[
+                    ('imputer', SimpleImputer(strategy='median')),
+                    ('scaler', StandardScaler())  # ou utilisez scaler_choice si vous voulez varier le scaler
+                ])
+
+                categorical_transformer = Pipeline(steps=[
+                    ('imputer', SimpleImputer(strategy='most_frequent')),
+                    ('onehot', OneHotEncoder(drop='first'))
+                ])
+
+                preprocessor = ColumnTransformer(
+                    transformers=[
+                        ('num', numeric_transformer, numeric_features),
+                        ('cat', categorical_transformer, categorical_features)
+                    ])
+
+                models = {
+                    "Régression Logistique": LogisticRegression(max_iter=1000),
+                    "Arbre de Décision": DecisionTreeClassifier(),
+                    "SVM": SVC(probability=True),
+                    "Random Forest": RandomForestClassifier()
+                }
+
+                param_grids = {
+                    "Régression Logistique": {
+                        'classifier__C': [0.1, 1.0, 10],
+                        'classifier__solver': ['liblinear', 'saga']
+                    },
+                    "Arbre de Décision": {
+                        'classifier__max_depth': [5, 10, 20],
+                        'classifier__min_samples_split': [2, 10, 20]
+                    },
+                    "SVM": {
+                        'classifier__C': [0.1, 1.0, 10],
+                        'classifier__kernel': ['linear', 'rbf']
+                    },
+                    "Random Forest": {
+                        'classifier__n_estimators': [50, 100, 200],
+                        'classifier__max_depth': [5, 10, 20]
+                    }
+                }
+
+                results = []
+                
+                # Division des données
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+                for model_name, model in models.items():
+                    param_grid = param_grids[model_name]
+                    clf = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', model)])
+                    grid_search = GridSearchCV(clf, param_grid, cv=5, scoring='f1_weighted')
+                    grid_search.fit(X_train, y_train)
+                    y_pred = grid_search.predict(X_test)
+                    y_prob = grid_search.predict_proba(X_test)[:, 1]
+
+                    accuracy = accuracy_score(y_test, y_pred)
+                    f1 = f1_score(y_test, y_pred, average='weighted', pos_label='En défaut')
+                    precision, recall, _ = precision_recall_curve(y_test, y_prob, pos_label='En défaut')
+
+                    results.append({
+                        "Modèle": model_name,
+                        "Accuracy": accuracy,
+                        "F1 Score": f1,
+                        "Recall": recall,
+                        "Precision": precision,
+                        "Meilleurs hyperparamètres": grid_search.best_params_
+                    })
+
+                results_df = pd.DataFrame(results).drop(columns=['Recall', 'Precision', 'Meilleurs hyperparamètres'])
+                st.write(results_df)
+
+                for result in results:
+                    st.write(f"### {result['Modèle']}")
+                    st.write(f"Meilleurs hyperparamètres : {result['Meilleurs hyperparamètres']}")
+                    pr_fig = px.area(x=result['Recall'], y=result['Precision'], title=f'Courbe de Précision-Rappel ({result["Modèle"]})', labels=dict(x='Rappel', y='Précision'))
+                    st.plotly_chart(pr_fig)
             else:
                 st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
         else:
