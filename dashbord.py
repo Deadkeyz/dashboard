@@ -16,7 +16,23 @@ from sklearn.impute import SimpleImputer
 
 # Titre du dashboard
 st.set_page_config(page_title="Projet Data Science", layout="wide")
-
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background: url(https://giphy.com/embed/crwwGNqIMccLXpD10F);
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+    .block-container {
+        background: rgba(255, 255, 255, 0.8);
+        padding: 2rem;
+        border-radius: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 # Fonction pour charger les données
 @st.cache_data
 def load_data(file):
