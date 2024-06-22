@@ -46,6 +46,7 @@ st.markdown(background_css, unsafe_allow_html=True)
 @st.cache_data
 def load_data(file):
     data = pd.read_csv(file)
+    data = data.sample(frac=1).reset_index(drop=True)  # Mélange les lignes et réinitialise les index
     return data
 
 def apply_scaler(data, scaler_choice):
