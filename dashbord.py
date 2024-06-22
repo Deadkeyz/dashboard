@@ -218,12 +218,15 @@ def main():
             
                 for col, comment in bivar_comments.items():
                     if col in data.columns:
-                        fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
+                        if data[col].dtype in ['int64', 'float64']:
+                            fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
+                        else:
+                            fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}")
                         st.plotly_chart(fig)
                         st.write(f"Commentaire : {comment}")
             else:
                 st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
-
+            
 
     elif choice == "Modélisation et évaluation":
         st.header("Modélisation et évaluation des modèles")
