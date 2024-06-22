@@ -21,7 +21,6 @@ background_css = """
 <style>
 /* Appliquer la couleur de l'arrière-plan à toute la page */
 [data-testid="stAppViewContainer"] {
-    background-color: #effbf0;
     background: url('bg.jpg');
     background-size: cover;
     background-repeat: no-repeat;
