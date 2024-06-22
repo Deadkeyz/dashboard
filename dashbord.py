@@ -27,7 +27,7 @@ background_css = """
 
 /* Appliquer la couleur de l'arrière-plan à l'élément principal */
 .main {
-    background-color: #ADD8E6;
+    background-color: #effbf0;
 }
 
 /* Appliquer la couleur de l'arrière-plan à la barre latérale */
