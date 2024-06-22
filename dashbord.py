@@ -46,15 +46,35 @@ def main():
         st.title("Projet Data Science - Prédiction du Risque de Défaut de Crédit")
         st.write("""
             ## Introduction
-                 Dans cette mission, nous utiliserons Python pour examiner un ensemble de données contenant des prêts. L'ensemble de données contient une variable cible BAD .
-                 Elle indique si le prêt a fait défaut ou non. Si la valeur est définie sur 1, le prêt est devenu irrécouvrable et la banque a perdu de l'argent.
-                 Si la valeur est fixée à 0, le prêt a été remboursé.
-                 Ce sont ces données que nous utiliserons tout au long de ce cours afin de développer des modèles prédictifs qui serviront à déterminer le niveau de risque de chaque prêt.
-                 Comme toutes les données du monde réel, ces données sont loin d’être parfaites.
-                 Il contient des variables numériques et catégorielles. Il contient des données manquantes.
-                 Il contient des valeurs aberrantes.
+            Ce dashboard interactif permet de charger un fichier CSV, d'explorer les données,
+            de les préparer, de construire des modèles de prédiction et d'évaluer leurs performances. 
+            Dans ce projet, nous allons explorer et analyser un ensemble de données de 5960 observations avec 13 variables, afin de prédire la probabilité de défaut de crédit. Les données contiennent des informations sur les prêts, les hypothèques, les emplois, et d'autres variables financières et démographiques.        
         """)
-        st.image("Franck.png", use_column_width=True)
+         # Carte de la Côte d'Ivoire avec Abidjan en couleur différente
+        df_map = pd.DataFrame({
+            'city': ['Abidjan', 'Bouaké', 'Daloa', 'Korhogo', 'Yamoussoukro', 'San-Pédro', 'Man', 'Gagnoa'],
+            'lat': [5.30966, 7.6899, 6.8774, 9.4591, 6.8276, 4.7500, 7.4125, 6.1319],
+            'lon': [-4.01266, -5.0318, -6.4502, -5.6296, -5.2767, -6.6500, -7.5536, -5.9498],
+            'color': ['red', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue']
+        })
+
+        fig_map = px.scatter_geo(df_map,
+                                 lat='lat',
+                                 lon='lon',
+                                 text='city',
+                                 scope='africa',
+                                 color='color',
+                                 hover_name='city',
+                                 )
+
+        fig_map.update_traces(marker=dict(size=10))
+        fig_map.update_layout(
+            autosize=False,
+            width=800,  # Largeur de la carte
+            height=600,  # Hauteur de la carte
+            margin=dict(l=0, r=0, b=0, t=40)
+        )
+        st.plotly_chart(fig_map)
     elif choice == "Compréhension des données":
         if uploaded_file is not None:
             data = load_data(uploaded_file)
