@@ -39,7 +39,7 @@ uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type="csv"
 # Affichage de l'image du logo dans l'en-tête de la barre latérale
 
 def main():
-    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation"]
+    menu = ["Accueil", "Compréhension des données", "Modélisation et évaluation", "Amélioration du Modèle"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Accueil":
@@ -50,7 +50,8 @@ def main():
             de les préparer, de construire des modèles de prédiction et d'évaluer leurs performances. 
             Dans ce projet, nous allons explorer et analyser un ensemble de données de 5960 observations avec 13 variables, afin de prédire la probabilité de défaut de crédit. Les données contiennent des informations sur les prêts, les hypothèques, les emplois, et d'autres variables financières et démographiques.        
         """)
-         # Carte de la Côte d'Ivoire avec Abidjan en couleur différente
+        
+        # Carte de la Côte d'Ivoire avec Abidjan en couleur différente
         df_map = pd.DataFrame({
             'city': ['Abidjan', 'Bouaké', 'Daloa', 'Korhogo', 'Yamoussoukro', 'San-Pédro', 'Man', 'Gagnoa'],
             'lat': [5.30966, 7.6899, 6.8774, 9.4591, 6.8276, 4.7500, 7.4125, 6.1319],
@@ -65,7 +66,7 @@ def main():
                                  scope='africa',
                                  color='color',
                                  hover_name='city',
-                                 )
+                                 title='Carte de la Côte d\'Ivoire avec Abidjan en rouge')
 
         fig_map.update_traces(marker=dict(size=10))
         fig_map.update_layout(
@@ -75,13 +76,12 @@ def main():
             margin=dict(l=0, r=0, b=0, t=40)
         )
         st.plotly_chart(fig_map)
+
     elif choice == "Compréhension des données":
         if uploaded_file is not None:
             data = load_data(uploaded_file)
             st.header("Aperçu des données")
-            st.write(data.info())
-            st.write(data.head())
-            
+            st.write(data)
             st.write("""
                 ## Description des Données
                 Les données contiennent les variables suivantes:
@@ -99,7 +99,10 @@ def main():
                 - **CLNO** : Nombre de lignes de crédit
                 - **DEBTINC** : Ratio dette/revenu
             """)
-            st.write("Vérification des valeurs manquantes et des valeurs aberrantes")
+            st.header("Vérification des valeurs manquantes, doublons et des valeurs aberrantes")
+
+            st.subheader("Es ce que le jeux de donnee contient des valeur manquante ?")
+
             missing_data = data.isnull().sum()
             st.write(missing_data[missing_data > 0])
             st.write(""" 
@@ -137,7 +140,40 @@ def main():
                 data['DEBTINC'].fillna(data['DEBTINC'].median(), inplace=True)
 
                 st.write("Données après remplacement des valeurs manquantes par le mode et la médiane :")
-                st.write(data.head())
+                st.write(data)
+                st.header("Es ce que le jeux de donnee contient des doublons ?")
+                duplicate_count = data.duplicated().sum()
+                st.write(f"Nombre de doublons : {duplicate_count}")
+
+                if duplicate_count > 0:
+                    remove_duplicates = st.checkbox("Supprimer les doublons")
+                    if remove_duplicates:
+                        data = data.drop_duplicates()
+                        st.write("Doublons supprimés.")
+                        st.write(f"Nouveau nombre de doublons : {data.duplicated().sum()}")
+                        st.write(data)
+
+                st.header("Est-ce que le jeu de données contient des valeurs aberrantes ?")
+                st.write("Les valeurs aberrantes seront détectées en utilisant les limites de l'écart interquartile (IQR).")
+
+                numeric_columns = data.select_dtypes(include=[np.number]).columns
+                outlier_counts = {}
+                for col in numeric_columns:
+                    Q1 = data[col].quantile(0.25)
+                    Q3 = data[col].quantile(0.75)
+                    IQR = Q3 - Q1
+                    lower_bound = Q1 - 1.5 * IQR
+                    upper_bound = Q3 + 1.5 * IQR
+                    outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
+                    outlier_counts[col] = len(outliers)
+
+                st.write("Nombre de valeurs aberrantes détectées par colonne :")
+                st.write(outlier_counts)
+
+                # Supprimer les valeurs aberrantes
+                
+
+                st.write("Pour l'instant nous gardons les valeur aberantes pour la conception dun modele de reference ?")
                 st.header("Analyse Exploratoire des Données")
 
                 st.subheader("Statistiques descriptives")
@@ -293,14 +329,15 @@ def main():
                 bins = [-1, 0, 1]  # Ajustez ces seuils selon vos besoins
                 labels = ['Conforme', 'En défaut']
                 data['BAD'] = pd.cut(data['BAD'], bins=bins, labels=labels, right=True)
-
+                
+                
                 # Prétraitement des variables
                 for col in ['REASON', 'JOB', 'MORTDUE', 'VALUE', 'YOJ', 'DEROG', 'DELINQ', 'CLAGE', 'NINQ', 'CLNO', 'DEBTINC']:
                     if data[col].dtype in ['float64', 'int64']:
                         data[col].fillna(data[col].median(), inplace=True)
                     else:
                         data[col].fillna(data[col].mode()[0], inplace=True)
-
+                
                 columns_to_exclude = st.multiselect("Sélectionnez les variables à exclure", options=data.columns)
                 data = data.drop(columns=columns_to_exclude)
                 scaler_choice = st.selectbox("Choisissez le type de standardisation", ["StandardScaler", "RobustScaler", "MinMaxScaler"])
@@ -387,5 +424,141 @@ def main():
         else:
             st.warning("Veuillez uploader un fichier CSV pour modéliser les données.")
 
+    elif choice == "Amélioration du Modèle":
+        if uploaded_file is not None:
+            data = load_data(uploaded_file)
+            st.header("Amélioration du Modèle de Référence")
+            
+            st.header("Prise en compte des valeurs aberrantes")
+            if 'BAD' in data.columns and data['BAD'].dtype in ['int64', 'float64']:
+                bins = [-1, 0, 1]  # Ajustez ces seuils selon vos besoins
+                labels = ['Conforme', 'En défaut']
+                data['BAD'] = pd.cut(data['BAD'], bins=bins, labels=labels, right=True)
+                data['BAD'] = data['BAD'].astype(str)
+                st.write("Gestion des valeurs manquantes")
+                data['REASON'].fillna(data['REASON'].mode()[0], inplace=True)
+                data['JOB'].fillna(data['JOB'].mode()[0], inplace=True)
+                data['MORTDUE'].fillna(data['MORTDUE'].median(), inplace=True)
+                data['VALUE'].fillna(data['VALUE'].median(), inplace=True)
+                data['YOJ'].fillna(data['YOJ'].median(), inplace=True)
+                data['DEROG'].fillna(data['DEROG'].median(), inplace=True)
+                data['DELINQ'].fillna(data['DELINQ'].median(), inplace=True)
+                data['CLAGE'].fillna(data['CLAGE'].median(), inplace=True)
+                data['NINQ'].fillna(data['NINQ'].median(), inplace=True)
+                data['CLNO'].fillna(data['CLNO'].median(), inplace=True)
+                data['DEBTINC'].fillna(data['DEBTINC'].median(), inplace=True)
+                st.write("Les valeurs aberrantes seront détectées en utilisant les limites de l'écart interquartile (IQR).")
+
+                numeric_columns = data.select_dtypes(include=[np.number]).columns
+                outlier_counts = {}
+                for col in numeric_columns:
+                    Q1 = data[col].quantile(0.25)
+                    Q3 = data[col].quantile(0.75)
+                    IQR = Q3 - Q1
+                    lower_bound = Q1 - 1.5 * IQR
+                    upper_bound = Q3 + 1.5 * IQR
+                    outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
+                    outlier_counts[col] = len(outliers)
+                    data = data[~((data[col] < lower_bound) | (data[col] > upper_bound))]
+
+                st.write("Nombre de valeurs aberrantes détectées par colonne :")
+                st.write(outlier_counts)
+                st.write("Données après suppression des valeurs aberrantes :")
+                st.write(data)
+
+                st.header("Modélisation et évaluation des modèles")
+
+                # Prétraitement des variables
+                for col in ['REASON', 'JOB', 'MORTDUE', 'VALUE', 'YOJ', 'DEROG', 'DELINQ', 'CLAGE', 'NINQ', 'CLNO', 'DEBTINC']:
+                    if data[col].dtype in ['float64', 'int64']:
+                        data[col].fillna(data[col].median(), inplace=True)
+                    else:
+                        data[col].fillna(data[col].mode()[0], inplace=True)
+
+                columns_to_exclude = st.multiselect("Sélectionnez les variables à exclure", options=data.columns)
+                data = data.drop(columns=columns_to_exclude)
+                scaler_choice = st.selectbox("Choisissez le type de standardisation", ["StandardScaler", "RobustScaler", "MinMaxScaler"])
+                data_scaled = apply_scaler(data, scaler_choice)
+
+                # Sélection de la colonne cible et des données
+                target_column = st.selectbox("Sélectionnez la colonne cible", data.columns)
+                X = data.drop(columns=[target_column])
+                y = data[target_column]
+
+                # Configuration des pipelines pour les transformations numériques et catégoriques
+                numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
+                categorical_features = X.select_dtypes(include=['object']).columns
+
+                numeric_transformer = Pipeline(steps=[
+                    ('imputer', SimpleImputer(strategy='median')),
+                    ('scaler', StandardScaler())  # ou utilisez scaler_choice si vous voulez varier le scaler
+                ])
+
+                categorical_transformer = Pipeline(steps=[
+                    ('imputer', SimpleImputer(strategy='most_frequent')),
+                    ('onehot', OneHotEncoder(drop='first'))
+                ])
+
+                preprocessor = ColumnTransformer(
+                    transformers=[
+                        ('num', numeric_transformer, numeric_features),
+                        ('cat', categorical_transformer, categorical_features)
+                    ])
+
+                # Choix et configuration du modèle
+                model_choice = st.selectbox("Choisissez le modèle", ["Régression Logistique", "Arbre de Décision"])
+                if model_choice == "Régression Logistique":
+                    model = LogisticRegression(max_iter=1000)
+                    param_grid = {
+                        'classifier__C': [0.1, 1.0, 10],
+                        'classifier__solver': ['liblinear', 'saga']
+                    }
+                else:
+                    model = DecisionTreeClassifier()
+                    param_grid = {
+                        'classifier__max_depth': [5, 10, 20],
+                        'classifier__min_samples_split': [2, 10, 20]
+                    }
+
+                clf = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', model)])
+
+                # Division des données et entraînement
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+                grid_search = GridSearchCV(clf, param_grid, cv=5, scoring='f1_weighted')
+                grid_search.fit(X_train, y_train)
+                y_pred = grid_search.predict(X_test)
+                y_prob = grid_search.predict_proba(X_test)[:, 1]  # Assurez-vous que cela retourne les probabilités pour la classe positive
+
+                # Évaluation du modèle
+                accuracy = accuracy_score(y_test, y_pred)
+                f1 = f1_score(y_test, y_pred, average='weighted', pos_label='En défaut')  # Spécifiez pos_label explicitement
+                cm = confusion_matrix(y_test, y_pred)
+                fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion")
+                st.plotly_chart(fig_cm)
+
+                # Calcul des métriques
+                fpr, tpr, _ = roc_curve(y_test, y_prob, pos_label='En défaut')
+                roc_auc = auc(fpr, tpr)
+                fig_roc = go.Figure(data=go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC curve (AUC = {roc_auc:.2f})'))
+                fig_roc.update_layout(title="Courbe ROC",
+                                    xaxis_title='Taux de Faux Positifs',
+                                    yaxis_title='Taux de Vrais Positifs')
+
+                precision, recall, _ = precision_recall_curve(y_test, y_prob, pos_label='En défaut')
+                fig_pr = go.Figure(data=go.Scatter(x=recall, y=precision, mode='lines'))
+                fig_pr.update_layout(title="Courbe de Précision-Rappel",
+                                    xaxis_title='Rappel',
+                                    yaxis_title='Précision')
+
+                # Affichage des résultats et des graphiques dans Streamlit
+                st.write(f"Accuracy: {accuracy}")
+                st.write(f"F1 Score: {f1}")
+                st.write("Meilleurs hyperparamètres :", grid_search.best_params_)
+                st.plotly_chart(fig_roc)
+                st.plotly_chart(fig_pr)
+            else:
+                st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
+        else:
+            st.warning("Veuillez uploader un fichier CSV pour modéliser les données.")
 if __name__ == '__main__':
     main()
