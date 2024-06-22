@@ -242,7 +242,7 @@ def main():
                 
                 for col, comment in univar_comments.items():
                     if col in data.columns:
-                        fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=['#effbf0'])
+                        fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=['#80b784'])
                         st.plotly_chart(fig)
                         st.write(f"Commentaire : {comment}")
                 
@@ -266,9 +266,9 @@ def main():
                     if col in data.columns:
                         if data[col].dtype in ['int64', 'float64']:
                             fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
-                            fig.update_traces(marker_color='#effbf0')
+                            fig.update_traces(marker_color='#80b784')
                         else:
-                            fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=['#effbf0'])
+                            fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=['#80b784'])
                         st.plotly_chart(fig)
                         st.write(f"Commentaire : {comment}")
             else:
