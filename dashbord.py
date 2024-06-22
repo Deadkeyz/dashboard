@@ -275,6 +275,7 @@ def main():
                             st.write(f"Error processing column {col}: {e}")
                 
                 st.subheader("Relations entre les variables (Bivarié)")
+
                 bivar_comments = {
                     'LOAN': "La relation entre BAD et LOAN montre que les prêts plus élevés sont associés à un risque plus élevé de défaut. On observe que les individus en défaut (En défaut) ont tendance à avoir des montants de prêt plus élevés comparativement aux individus conformes (Conforme).",
                     'MORTDUE': "La relation entre BAD et MORTDUE montre que les montants dus sur les hypothèques sont plus élevés pour les individus en défaut. Cela pourrait indiquer une difficulté à gérer les obligations hypothécaires pour les personnes ayant des prêts en défaut.",
@@ -290,11 +291,20 @@ def main():
                     'DEBTINC': "La relation entre BAD et DEBTINC montre que les individus avec un ratio dette/revenu élevé sont plus susceptibles d'être en défaut. Un ratio dette/revenu élevé indique une charge financière importante par rapport aux revenus, augmentant ainsi le risque de défaut."
                 }
                 
+                def detect_outliers(df, column):
+                    q1 = df[column].quantile(0.25)
+                    q3 = df[column].quantile(0.75)
+                    iqr = q3 - q1
+                    lower_bound = q1 - 1.5 * iqr
+                    upper_bound = q3 + 1.5 * iqr
+                    outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
+                    return outliers
+                
                 for col, comment in bivar_comments.items():
                     if col in data.columns:
                         try:
-                            outliers = detect_outliers(data, col)
                             if data[col].dtype in ['int64', 'float64']:
+                                outliers = detect_outliers(data, col)
                                 fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
                                 fig.update_traces(marker=dict(color='#80b784'))
                                 fig.add_trace(go.Box(
@@ -304,7 +314,7 @@ def main():
                                     marker=dict(color='red')
                                 ))
                             else:
-                                fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=colors)
+                                fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=px.colors.qualitative.Set1)
                             st.plotly_chart(fig)
                             st.write(f"Commentaire : {comment}")
                         except Exception as e:
