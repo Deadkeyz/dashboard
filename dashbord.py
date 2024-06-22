@@ -177,9 +177,9 @@ def main():
                         comment_bad = (
                         "La catégorie 'Other' domine nettement la distribution, ce qui indique que la majorité des emprunteurs dans l'ensemble de données "
                         "ne rentrent pas dans les catégories d'emploi traditionnelles listées ou travaillent dans des secteurs variés. "
-                        "Les professions 'Self' (indépendants) et 'ProfExe' (professionnels exécutifs) sont également bien représentées, "
+                        "Les professions 'office', 'Mgr'  et 'ProfExe' (professionnels exécutifs) sont également bien représentées, "
                         "suggérant une présence significative d'individus ayant probablement un niveau de revenu et de stabilité financière plus élevé. "
-                        "Les catégories 'Office' et 'Sales' sont moins représentées, ce qui pourrait indiquer des niveaux de revenus inférieurs ou "
+                        "Les catégories 'Self' (indépendants) et 'Sales' sont moins représentées, ce qui pourrait indiquer des niveaux de revenus inférieurs ou "
                         "une stabilité d'emploi moindre comparativement aux autres groupes."
                     )
                         st.write(f"Commentaire : {comment_bad}")
