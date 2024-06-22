@@ -76,7 +76,7 @@ def main():
             'city': ['Abidjan', 'Bouaké', 'Daloa', 'Korhogo', 'Yamoussoukro', 'San-Pédro', 'Man', 'Gagnoa'],
             'lat': [5.30966, 7.6899, 6.8774, 9.4591, 6.8276, 4.7500, 7.4125, 6.1319],
             'lon': [-4.01266, -5.0318, -6.4502, -5.6296, -5.2767, -6.6500, -7.5536, -5.9498],
-            'color': ['red', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue']
+            'color': ['#1280EF', '#ED7F10', '#ED7F10', '#ED7F10', '#ED7F10', '#ED7F10', '#ED7F10', '#ED7F10']
         })
 
         fig_map = px.scatter_geo(df_map,
@@ -86,7 +86,7 @@ def main():
                                  scope='africa',
                                  color='color',
                                  hover_name='city',
-                                 title='Carte de la Côte d\'Ivoire avec Abidjan en rouge')
+                                 title='Pays des concepteur du projet')
 
         fig_map.update_traces(marker=dict(size=10))
         fig_map.update_layout(
