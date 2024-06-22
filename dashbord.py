@@ -22,7 +22,7 @@ background_css = """
 <style>
 /* Appliquer la couleur de l'arrière-plan à toute la page */
 [data-testid="stAppViewContainer"] {
-    background-color: #ADD8E6;
+    background-color: #effbf0;
 }
 
 /* Appliquer la couleur de l'arrière-plan à l'élément principal */
