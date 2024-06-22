@@ -46,7 +46,9 @@ def main():
         st.title("Projet Data Science - Prédiction du Risque de Défaut de Crédit")
         st.write("""
             ## Introduction
-                 Dans cette mission, nous utiliserons Python pour examiner un ensemble de données contenant des prêts. L'ensemble de données contient une variable cible BAD . Elle indique si le prêt a fait défaut ou non. Si la valeur est définie sur 1, le prêt est devenu irrécouvrable et la banque a perdu de l'argent. Si la valeur est fixée à 0, le prêt a été remboursé.
+                 Dans cette mission, nous utiliserons Python pour examiner un ensemble de données contenant des prêts. L'ensemble de données contient une variable cible BAD .
+                 Elle indique si le prêt a fait défaut ou non. Si la valeur est définie sur 1, le prêt est devenu irrécouvrable et la banque a perdu de l'argent.
+                 Si la valeur est fixée à 0, le prêt a été remboursé.
                  Ce sont ces données que nous utiliserons tout au long de ce cours afin de développer des modèles prédictifs qui serviront à déterminer le niveau de risque de chaque prêt.
                  Comme toutes les données du monde réel, ces données sont loin d’être parfaites.
                  Il contient des variables numériques et catégorielles. Il contient des données manquantes.
