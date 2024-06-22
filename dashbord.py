@@ -2,7 +2,6 @@ import numpy as np
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -16,19 +15,20 @@ from sklearn.impute import SimpleImputer
 
 # Titre du dashboard
 st.set_page_config(page_title="Projet Data Science", layout="wide")
-# Définir le CSS pour changer la couleur de l'arrière-plan
+
+# Définir le CSS pour changer la couleur de l'arrière-plan et de la barre latérale
 background_css = """
 <style>
 /* Appliquer la couleur de l'arrière-plan à toute la page */
 [data-testid="stAppViewContainer"] {
-    background-color: #effbf0,
+    background-color: #effbf0;
     background: url(https://giphy.com/embed/crwwGNqIMccLXpD10F);
-        background-size: cover;
-        background-repeat: no-repeat;;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
-/* Appliquer la couleur de l'arrière-plan à l'élément principal */
-.main {
+/* Appliquer la couleur de l'arrière-plan à la barre latérale */
+[data-testid="stSidebar"] {
     background-color: #effbf0;
 }
 </style>
@@ -36,6 +36,7 @@ background_css = """
 
 # Injecter le CSS dans l'application
 st.markdown(background_css, unsafe_allow_html=True)
+
 # Fonction pour charger les données
 @st.cache_data
 def load_data(file):
@@ -615,5 +616,6 @@ def main():
                 st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
         else:
             st.warning("Veuillez uploader un fichier CSV pour modéliser les données.")
+
 if __name__ == '__main__':
     main()
