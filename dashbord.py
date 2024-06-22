@@ -23,7 +23,7 @@ background_css = """
 /* Appliquer la couleur de l'arrière-plan à toute la page */
 [data-testid="stAppViewContainer"] {
     background-color: #effbf0;
-    background: url(https://media.giphy.com/media/crwwGNqIMccLXpD10F/giphy.gif);
+    background: url(https://giphy.com/embed/crwwGNqIMccLXpD10F);
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -206,13 +206,16 @@ def main():
                 numeric_columns = data.select_dtypes(include=[np.number]).columns
                 outlier_counts = {}
                 for col in numeric_columns:
-                    Q1 = data[col].quantile(0.25)
-                    Q3 = data[col].quantile(0.75)
-                    IQR = Q3 - Q1
-                    lower_bound = Q1 - 1.5 * IQR
-                    upper_bound = Q3 + 1.5 * IQR
-                    outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
-                    outlier_counts[col] = len(outliers)
+                    try:
+                        Q1 = data[col].quantile(0.25)
+                        Q3 = data[col].quantile(0.75)
+                        IQR = Q3 - Q1
+                        lower_bound = Q1 - 1.5 * IQR
+                        upper_bound = Q3 + 1.5 * IQR
+                        outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
+                        outlier_counts[col] = len(outliers)
+                    except Exception as e:
+                        st.write(f"Error processing column {col}: {e}")
             
                 st.write("Nombre de valeurs aberrantes détectées par colonne :")
                 st.write(outlier_counts)
@@ -254,15 +257,18 @@ def main():
                 
                 for col, comment in univar_comments.items():
                     if col in data.columns:
-                        outliers = detect_outliers(data, col)
-                        fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=colors)
-                        fig.add_trace(go.Histogram(
-                            x=outliers[col],
-                            name='Outliers',
-                            marker=dict(color='red')
-                        ))
-                        st.plotly_chart(fig)
-                        st.write(f"Commentaire : {comment}")
+                        try:
+                            outliers = detect_outliers(data, col)
+                            fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=colors)
+                            fig.add_trace(go.Histogram(
+                                x=outliers[col],
+                                name='Outliers',
+                                marker=dict(color='red')
+                            ))
+                            st.plotly_chart(fig)
+                            st.write(f"Commentaire : {comment}")
+                        except Exception as e:
+                            st.write(f"Error processing column {col}: {e}")
                 
                 st.subheader("Relations entre les variables (Bivarié)")
                 bivar_comments = {
@@ -282,20 +288,23 @@ def main():
                 
                 for col, comment in bivar_comments.items():
                     if col in data.columns:
-                        outliers = detect_outliers(data, col)
-                        if data[col].dtype in ['int64', 'float64']:
-                            fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
-                            fig.update_traces(marker=dict(color='#80b784'))
-                            fig.add_trace(go.Box(
-                                y=outliers[col],
-                                x=outliers['BAD'],
-                                name='Outliers',
-                                marker=dict(color='red')
-                            ))
-                        else:
-                            fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=colors)
-                        st.plotly_chart(fig)
-                        st.write(f"Commentaire : {comment}")
+                        try:
+                            outliers = detect_outliers(data, col)
+                            if data[col].dtype in ['int64', 'float64']:
+                                fig = px.box(data, x='BAD', y=col, title=f"Relation entre BAD et {col}")
+                                fig.update_traces(marker=dict(color='#80b784'))
+                                fig.add_trace(go.Box(
+                                    y=outliers[col],
+                                    x=outliers['BAD'],
+                                    name='Outliers',
+                                    marker=dict(color='red')
+                                ))
+                            else:
+                                fig = px.bar(data, x='BAD', color=col, title=f"Relation entre BAD et {col}", color_discrete_sequence=colors)
+                            st.plotly_chart(fig)
+                            st.write(f"Commentaire : {comment}")
+                        except Exception as e:
+                            st.write(f"Error processing column {col}: {e}")
             else:
                 st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
             
@@ -436,14 +445,17 @@ def main():
                 numeric_columns = data.select_dtypes(include=[np.number]).columns
                 outlier_counts = {}
                 for col in numeric_columns:
-                    Q1 = data[col].quantile(0.25)
-                    Q3 = data[col].quantile(0.75)
-                    IQR = Q3 - Q1
-                    lower_bound = Q1 - 1.5 * IQR
-                    upper_bound = Q3 + 1.5 * IQR
-                    outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
-                    outlier_counts[col] = len(outliers)
-                    data = data[~((data[col] < lower_bound) | (data[col] > upper_bound))]
+                    try:
+                        Q1 = data[col].quantile(0.25)
+                        Q3 = data[col].quantile(0.75)
+                        IQR = Q3 - Q1
+                        lower_bound = Q1 - 1.5 * IQR
+                        upper_bound = Q3 + 1.5 * IQR
+                        outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
+                        outlier_counts[col] = len(outliers)
+                        data = data[~((data[col] < lower_bound) | (data[col] > upper_bound))]
+                    except Exception as e:
+                        st.write(f"Error processing column {col}: {e}")
 
                 st.write("Nombre de valeurs aberrantes détectées par colonne :")
                 st.write(outlier_counts)
