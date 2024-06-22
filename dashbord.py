@@ -76,26 +76,51 @@ def main():
             'city': ['Abidjan', 'Bouaké', 'Daloa', 'Korhogo', 'Yamoussoukro', 'San-Pédro', 'Man', 'Gagnoa'],
             'lat': [5.30966, 7.6899, 6.8774, 9.4591, 6.8276, 4.7500, 7.4125, 6.1319],
             'lon': [-4.01266, -5.0318, -6.4502, -5.6296, -5.2767, -6.6500, -7.5536, -5.9498],
-            'color': ['#1280EF', '#ED7F10', '#ED7F10', '#ED7F10', '#ED7F10', '#ED7F10', '#ED7F10', '#ED7F10']
+            'color': ['green', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange']
         })
-
-        fig_map = px.scatter_geo(df_map,
-                                 lat='lat',
-                                 lon='lon',
-                                 text='city',
-                                 scope='africa',
-                                 color='color',
-                                 hover_name='city',
-                                 title='Pays des concepteur du projet')
-
-        fig_map.update_traces(marker=dict(size=10))
-        fig_map.update_layout(
+        
+        fig = go.Figure()
+        
+        # Ajouter des points pour chaque ville
+        for i, row in df_map.iterrows():
+            fig.add_trace(go.Scattergeo(
+                locationmode='country names',
+                lon=[row['lon']],
+                lat=[row['lat']],
+                text=row['city'],
+                marker=dict(
+                    size=10,
+                    color=row['color'],
+                    line=dict(width=2, color='black')
+                ),
+                name=row['city']
+            ))
+        
+        # Mise en page de la carte
+        fig.update_layout(
+            title_text='Carte de la Côte d\'Ivoire',
+            showlegend=False,
+            geo=dict(
+                scope='africa',
+                projection_type='natural earth',
+                showland=True,
+                landcolor='green',
+                showocean=True,
+                oceancolor='lightblue',
+                lakecolor='lightblue',
+                showcountries=True,
+                countrycolor='black',
+                lonaxis=dict(range=[-8.6, -2.5]),
+                lataxis=dict(range=[4.0, 10.7]),
+                resolution=50
+            ),
             autosize=False,
             width=800,  # Largeur de la carte
             height=600,  # Hauteur de la carte
             margin=dict(l=0, r=0, b=0, t=40)
         )
-        st.plotly_chart(fig_map)
+        
+        st.plotly_chart(fig)    
 
     elif choice == "Compréhension des données":
         if uploaded_file is not None:
