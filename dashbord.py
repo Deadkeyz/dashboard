@@ -413,16 +413,19 @@ def main():
                 cm = confusion_matrix(y_test, y_pred)
 
                 st.write(f"Accuracy: {accuracy}, F1 Score: {f1}")
-                st.plotly_chart(px.imshow(cm, text_auto=True, color_continuous_scale='Blues', title="Matrice de Confusion"))
+                cm_fig = px.imshow(cm, text_auto=True, color_continuous_scale=[(0, "#effbf0"), (1, "#effbf0")], title="Matrice de Confusion", template="plotly_white")
+                st.plotly_chart(cm_fig)
 
                 # Calcul des métriques
                 fpr, tpr, _ = roc_curve(y_test, y_prob, pos_label='En défaut')
                 roc_auc = auc(fpr, tpr)
-                roc_fig = px.area(x=fpr, y=tpr, title=f'Courbe ROC (AUC = {roc_auc:.2f})', labels=dict(x='Taux de Faux Positifs', y='Taux de Vrais Positifs'))
+                roc_fig = px.area(x=fpr, y=tpr, title=f'Courbe ROC (AUC = {roc_auc:.2f})', labels=dict(x='Taux de Faux Positifs', y='Taux de Vrais Positifs'), template="plotly_white")
+                roc_fig.update_traces(fillcolor="#effbf0")
                 st.plotly_chart(roc_fig)
 
                 precision, recall, _ = precision_recall_curve(y_test, y_prob, pos_label='En défaut')
-                pr_fig = px.area(x=recall, y=precision, title='Courbe de Précision-Rappel', labels=dict(x='Rappel', y='Précision'))
+                pr_fig = px.area(x=recall, y=precision, title='Courbe de Précision-Rappel', labels=dict(x='Rappel', y='Précision'), template="plotly_white")
+                pr_fig.update_traces(fillcolor="#effbf0")
                 st.plotly_chart(pr_fig)
 
                 st.write("Meilleurs hyperparamètres :", grid_search.best_params_)
@@ -430,7 +433,6 @@ def main():
                 st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
         else:
             st.warning("Veuillez uploader un fichier CSV pour modéliser les données.")
-
     elif choice == "Amélioration du Modèle":
         if uploaded_file is not None:
             data = load_data(uploaded_file)
