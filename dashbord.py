@@ -309,7 +309,8 @@ def main():
                             st.write(f"Commentaire : {comment}")
                         except Exception as e:
                             st.write(f"Error processing column {col}: {e}")
-                st.header("Impact des variables sur BAD")
+                fig = px.strip(data, x='JOB', y='LOAN')
+                fig.show()
             else:
                 st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
         
