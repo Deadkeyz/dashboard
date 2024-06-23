@@ -310,7 +310,7 @@ def main():
                         except Exception as e:
                             st.write(f"Error processing column {col}: {e}")
                 fig = px.strip(data, x='JOB', y='LOAN')
-                fig.show()
+                st.plotly_chart(fig)
             else:
                 st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
         
