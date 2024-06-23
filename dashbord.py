@@ -14,39 +14,32 @@ from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 import plotly.graph_objects as go
 
-# Titre du dashboard
+# Set the page config
 st.set_page_config(page_title="Projet Data Science", layout="wide")
 
-# Définir le CSS pour changer la couleur de l'arrière-plan
+# CSS for background styling
 background_css = """
 <style>
-/* Appliquer la couleur de l'arrière-plan à toute la page */
 [data-testid="stAppViewContainer"] {
     background-color: #effbf0;
 }
-
-/* Appliquer la couleur de l'arrière-plan à l'élément principal */
 .main {
     background: url(bg.jpg);
     background-size: cover;
-    background-repeat: no-repeat;;
+    background-repeat: no-repeat;
 }
-
-/* Appliquer la couleur de l'arrière-plan à la barre latérale */
 [data-testid="stSidebar"] {
     background-color: #effbf0;
 }
 </style>
 """
-
-# Injecter le CSS dans l'application
 st.markdown(background_css, unsafe_allow_html=True)
 
-# Fonction pour charger les données
+# Function to load data
 @st.cache_data
 def load_data(file):
     data = pd.read_csv(file)
-    data = data.sample(frac=1).reset_index(drop=True)  # Mélange les lignes et réinitialise les index
+    data = data.sample(frac=1).reset_index(drop=True)
     return data
 
 def apply_scaler(data, scaler_choice):
@@ -59,9 +52,11 @@ def apply_scaler(data, scaler_choice):
     scaled_data = scaler.fit_transform(data.select_dtypes(include=[np.number]))
     return pd.DataFrame(scaled_data, columns=data.select_dtypes(include=[np.number]).columns)
 
+# Display the logo in the sidebar
 st.sidebar.image("logo.png", use_column_width=True)
+st.sidebar.image("logo-UFHB-e1699536639348-1024x747.png", use_column_width=True)
 
-# Uploader le fichier CSV dans la sidebar
+# File uploader
 uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type="csv")
 
 def main():
@@ -77,7 +72,7 @@ def main():
             Dans ce projet, nous allons explorer et analyser un ensemble de données de 5960 observations avec 13 variables, afin de prédire la probabilité de défaut de crédit. Les données contiennent des informations sur les prêts, les hypothèques, les emplois, et d'autres variables financières et démographiques.        
         """)
         
-        # Carte de la Côte d'Ivoire avec Abidjan en couleur différente
+        # Display map with cities
         df_map = pd.DataFrame({
             'city': ['Abidjan', 'Bouaké', 'Daloa', 'Korhogo', 'Yamoussoukro', 'San-Pédro', 'Man', 'Gagnoa'],
             'lat': [5.30966, 7.6899, 6.8774, 9.4591, 6.8276, 4.7500, 7.4125, 6.1319],
@@ -87,7 +82,6 @@ def main():
         
         fig = go.Figure()
         
-        # Ajouter des points pour chaque ville
         for i, row in df_map.iterrows():
             fig.add_trace(go.Scattergeo(
                 locationmode='country names',
@@ -102,9 +96,8 @@ def main():
                 name=row['city']
             ))
         
-        # Mise en page de la carte
         fig.update_layout(
-            title_text='Pays des concepteur du projet',
+            title_text='Pays des concepteurs du projet',
             showlegend=False,
             geo=dict(
                 scope='africa',
@@ -121,8 +114,8 @@ def main():
                 resolution=50
             ),
             autosize=False,
-            width=800,  # Largeur de la carte
-            height=600,  # Hauteur de la carte
+            width=800,
+            height=600,
             margin=dict(l=0, r=0, b=0, t=40)
         )
         
@@ -224,10 +217,6 @@ def main():
             
                 st.write("Nombre de valeurs aberrantes détectées par colonne :")
                 st.write(outlier_counts)
-            
-                # Supprimer les valeurs aberrantes
-                # Note: Vous avez indiqué que vous souhaitez les conserver pour l'instant
-                st.write("Pour l'instant nous gardons les valeurs aberrantes pour la conception d'un modèle de référence.")
             
                 st.header("Analyse Exploratoire des Données")
             
@@ -837,4 +826,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-st.sidebar.image("logo-UFHB-e1699536639348-1024x747.png", use_column_width=True)
