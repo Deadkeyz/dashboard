@@ -311,11 +311,11 @@ def main():
                             st.write(f"Error processing column {col}: {e}")
                 st.header("Impact des variables sur BAD")
 
-                if 'BAD' in data.columns:
+                if 'LOAN' in data.columns:
                     # Convertir 'BAD' en catégorie si nécessaire
-                    if data['BAD'].dtype not in ['int64', 'float64']:
-                        st.warning("La colonne 'BAD' doit être de type numérique. Conversion en cours...")
-                        data['BAD'] = pd.to_numeric(data['BAD'], errors='coerce')
+                    if data['LOAN'].dtype not in ['int64', 'float64']:
+                        st.warning("La colonne 'LOAN' doit être de type numérique. Conversion en cours...")
+                        data['LOAN'] = pd.to_numeric(data['LOAN'], errors='coerce')
             
                     # Sélectionner les colonnes numériques pour les box plots
                     numeric_columns = data.select_dtypes(include=[np.number]).columns
@@ -324,7 +324,7 @@ def main():
                     figures = []
                     for feature in numeric_columns:
                         if feature != 'BAD':
-                            fig = px.box(data, x='BAD', y=feature, points="all", title=f"Impact de {feature} sur BAD", color='BAD')
+                            fig = px.box(data, x='LOAN', y=feature, points="all", title=f"Impact de {feature} sur LOAN", color='LOAN')
                             figures.append(fig)
             
                     # Display the plots in Streamlit
@@ -580,11 +580,11 @@ def main():
                             st.write(f"Error processing column {col}: {e}")
                 st.header("Impact des variables sur BAD")
 
-                if 'BAD' in data.columns:
+                if 'LOAN' in data.columns:
                     # Convertir 'BAD' en catégorie si nécessaire
-                    if data['BAD'].dtype not in ['int64', 'float64']:
-                        st.warning("La colonne 'BAD' doit être de type numérique. Conversion en cours...")
-                        data['BAD'] = pd.to_numeric(data['BAD'], errors='coerce')
+                    if data['LOAN'].dtype not in ['int64', 'float64']:
+                        st.warning("La colonne 'LOAN' doit être de type numérique. Conversion en cours...")
+                        data['LOAN'] = pd.to_numeric(data['LOAN'], errors='coerce')
             
                     # Sélectionner les colonnes numériques pour les box plots
                     numeric_columns = data.select_dtypes(include=[np.number]).columns
@@ -592,8 +592,8 @@ def main():
                     # Create box plots for each numeric feature grouped by BAD
                     figures = []
                     for feature in numeric_columns:
-                        if feature != 'BAD':
-                            fig = px.box(data, x='BAD', y=feature, points="all", title=f"Impact de {feature} sur BAD", color='BAD')
+                        if feature != 'LOAN':
+                            fig = px.box(data, x='LOn', y=feature, points="all", title=f"Impact de {feature} sur LOAN", color='LOAN')
                             figures.append(fig)
             
                     # Display the plots in Streamlit
