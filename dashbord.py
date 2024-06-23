@@ -593,7 +593,7 @@ def main():
                     figures = []
                     for feature in numeric_columns:
                         if feature != 'LOAN':
-                            fig = px.box(data, x='LOn', y=feature, points="all", title=f"Impact de {feature} sur LOAN", color='LOAN')
+                            fig = px.box(data, x='LOAN', y=feature, points="all", title=f"Impact de {feature} sur LOAN", color='LOAN')
                             figures.append(fig)
             
                     # Display the plots in Streamlit
