@@ -54,7 +54,7 @@ def apply_scaler(data, scaler_choice):
 
 # Display the logo in the sidebar
 st.sidebar.image("logo.png", use_column_width=True)
-st.sidebar.image("logo-UFHB-e1699536639348-1024x747.png", use_column_width=True)
+
 
 # File uploader
 uploaded_file = st.sidebar.file_uploader("Choisissez un fichier CSV", type="csv")
@@ -787,3 +787,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+st.sidebar.image("logo-UFHB-e1699536639348-1024x747.png", use_column_width=True)
