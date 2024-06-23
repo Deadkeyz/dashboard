@@ -310,26 +310,6 @@ def main():
                         except Exception as e:
                             st.write(f"Error processing column {col}: {e}")
                 st.header("Impact des variables sur BAD")
-
-                if 'LOAN' in data.columns:
-                    # Convertir 'BAD' en catégorie si nécessaire
-                    if data['LOAN'].dtype not in ['int64', 'float64']:
-                        st.warning("La colonne 'LOAN' doit être de type numérique. Conversion en cours...")
-                        data['LOAN'] = pd.to_numeric(data['LOAN'], errors='coerce')
-            
-                    # Sélectionner les colonnes numériques pour les box plots
-                    numeric_columns = data.select_dtypes(include=[np.number]).columns
-            
-                    # Create box plots for each numeric feature grouped by BAD
-                    figures = []
-                    for feature in numeric_columns:
-                        if feature != 'BAD':
-                            fig = px.box(data, x='LOAN', y=feature, points="all", title=f"Impact de {feature} sur LOAN", color='BAD')
-                            figures.append(fig)
-            
-                    # Display the plots in Streamlit
-                    for fig in figures:
-                        st.plotly_chart(fig)
             else:
                 st.warning("Veuillez uploader un fichier CSV pour voir l'aperçu des données.")
         
@@ -579,26 +559,6 @@ def main():
                         except Exception as e:
                             st.write(f"Error processing column {col}: {e}")
                 st.header("Impact des variables sur BAD")
-
-                if 'LOAN' in data.columns:
-                    # Convertir 'BAD' en catégorie si nécessaire
-                    if data['LOAN'].dtype not in ['int64', 'float64']:
-                        st.warning("La colonne 'LOAN' doit être de type numérique. Conversion en cours...")
-                        data['LOAN'] = pd.to_numeric(data['LOAN'], errors='coerce')
-            
-                    # Sélectionner les colonnes numériques pour les box plots
-                    numeric_columns = data.select_dtypes(include=[np.number]).columns
-            
-                    # Create box plots for each numeric feature grouped by BAD
-                    figures = []
-                    for feature in numeric_columns:
-                        if feature != 'LOAN':
-                            fig = px.box(data, x='LOAN', y=feature, points="all", title=f"Impact de {feature} sur LOAN", color='BAD')
-                            figures.append(fig)
-            
-                    # Display the plots in Streamlit
-                    for fig in figures:
-                        st.plotly_chart(fig)
 
                 st.header("Modélisation et évaluation des modèles")
 
