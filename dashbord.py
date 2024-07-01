@@ -24,7 +24,7 @@ background_css = """
     background-color: #effbf0;
 }
 .main {
-    background: url(bg.jpg);
+    background: url(https://github.com/Deadkeyz/dashboard/blob/main/bg.jpg);
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -460,19 +460,20 @@ def main():
                         upper_bound = Q3 + 1.5 * IQR
                         outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
                         outlier_counts[col] = len(outliers)
-                        data = data[~((data[col] < lower_bound) | (data[col] > upper_bound))]
                     except Exception as e:
                         st.write(f"Error processing column {col}: {e}")
 
                 st.write("Nombre de valeurs aberrantes détectées par colonne :")
                 st.write(outlier_counts)
-                st.write("Données après suppression des valeurs aberrantes :")
-                st.write(data)
+                st.write("Dans cette partie qui consiste a l'amelioration de notre modele , nous avons choisi de dimimuer leurs impacts des valeurs extreme sur nos prediction en utilisant le logarithme")
+                st.write('Et comme la classe 0 contient la plus part des obserrvations nous allons equilibrer les poids pour que notre modele puisse avoir des informations equilibrer pour la classification')
                 st.header("Analyse Exploratoire des Données")
-            
+
                 colors = ['#80b784', '#668d68', '#4d734d', '#335a33']
 
                 # Fonction pour détecter les valeurs aberrantes
+
+                
                 def detect_outliers(data, col):
                     Q1 = data[col].quantile(0.25)
                     Q3 = data[col].quantile(0.75)
