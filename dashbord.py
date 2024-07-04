@@ -67,11 +67,10 @@ def main():
         st.title("Projet Data Science - Analyse de Risque de Défaut sur Prêts Hypothécaires")
         st.write("""
             ## Introduction
-            Lorsqu’on a des données, il est très important de les analyser en faisant une étude descriptive de celles-ci pour dégager tous les aspects importants pour notre étude.
-            de les préparer, de construire des modèles de prédiction et d'évaluer leurs performances. 
-            Les donn´ees utilis´ees pour notre ´etude proviennent d’une base de donn´ees t´el´echarg´ees sur le site
-            Kaggle. Le jeu de donn´ees se nomme hmeq.csv. Il contient les donn´ees de 5 960 individus observ´es selon
-            13 variables pr´esent´ees ci-dessous :
+            Lorsqu’on a des données, il est très important de les analyser en faisant une étude descriptive de celles-ci pour dégager tous les aspects importants pour notre étude. De les préparer, de construire des modèles de prédiction et d'évaluer leurs performances.
+            Les données utilisées pour notre étude proviennent d’une base de données téléchargée sur le site Kaggle.
+            Le jeu de données se nomme hmeq.csv.
+            Il contient les données de 5 960 individus observés selon 13 variables présentées ci-dessous :
         """)
         
         # Display map with cities
