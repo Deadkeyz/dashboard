@@ -64,7 +64,7 @@ def main():
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Accueil":
-        st.title("Projet Data Science - Prédiction du Risque de Défaut de Crédit")
+        st.title("Projet Data Science - Analyse de Risque de Défaut sur Prêts Hypothécaires")
         st.write("""
             ## Introduction
             Ce dashboard interactif permet de charger un fichier CSV, d'explorer les données,
