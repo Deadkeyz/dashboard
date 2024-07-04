@@ -67,9 +67,11 @@ def main():
         st.title("Projet Data Science - Analyse de Risque de Défaut sur Prêts Hypothécaires")
         st.write("""
             ## Introduction
-            Ce dashboard interactif permet de charger un fichier CSV, d'explorer les données,
+            Lorsqu’on a des données, il est très important de les analyser en faisant une étude descriptive de celles-ci pour dégager tous les aspects importants pour notre étude.
             de les préparer, de construire des modèles de prédiction et d'évaluer leurs performances. 
-            Dans ce projet, nous allons explorer et analyser un ensemble de données de 5960 observations avec 13 variables, afin de prédire la probabilité de défaut de crédit. Les données contiennent des informations sur les prêts, les hypothèques, les emplois, et d'autres variables financières et démographiques.        
+            Les donn´ees utilis´ees pour notre ´etude proviennent d’une base de donn´ees t´el´echarg´ees sur le site
+            Kaggle. Le jeu de donn´ees se nomme hmeq.csv. Il contient les donn´ees de 5 960 individus observ´es selon
+            13 variables pr´esent´ees ci-dessous :
         """)
         
         # Display map with cities
