@@ -446,6 +446,16 @@ def main():
                 pr_fig.update_traces(fillcolor="#107d59")
                 st.plotly_chart(pr_fig)
 
+                st.subheader("Interprétation de la courbe Précision-Rappel")
+                st.write("""
+                - **Performance du modèle :**
+                  - Une courbe qui reste proche du coin supérieur droit (haute précision et haut rappel) indique un modèle performant.
+                  - La courbe montre comment la précision et le rappel changent en fonction du seuil de décision.
+                
+                - **Compromis entre Précision et Rappel :**
+                  - En général, il existe un compromis entre la précision et le rappel. En augmentant le rappel (détecter plus de vrais positifs), la précision peut diminuer (augmenter les faux positifs), et vice versa.
+                """)
+
                 st.write("Meilleurs hyperparamètres :", grid_search.best_params_)
             else:
                 st.warning("La colonne 'BAD' est requise et doit être de type numérique.")
