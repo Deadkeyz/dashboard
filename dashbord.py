@@ -432,6 +432,15 @@ def main():
                 roc_fig.update_traces(fillcolor="#107d59")
                 st.plotly_chart(roc_fig)
 
+                st.subheader("Interprétation de la courbe ROC et de l'AUC")
+                st.write("""
+                - **Performance du modèle :**
+                  - Une AUC de 0.80 indique que le modèle a une bonne performance. En général, une AUC entre 0.7 et 0.8 est considérée comme acceptable, entre 0.8 et 0.9 comme excellente, et au-dessus de 0.9 comme exceptionnelle.
+                  
+                - **Équilibre entre Sensibilité et Spécificité :**
+                  - La courbe ROC permet de visualiser le compromis entre la sensibilité (taux de vrais positifs) et la spécificité (1 - taux de faux positifs) pour différents seuils de classification. Un modèle parfait aurait une courbe ROC qui passe par le point (0, 1).
+                """)
+
                 precision, recall, _ = precision_recall_curve(y_test, y_prob, pos_label='En défaut')
                 pr_fig = px.area(x=recall, y=precision, title='Courbe de Précision-Rappel', labels=dict(x='Rappel', y='Précision'), template="plotly_white")
                 pr_fig.update_traces(fillcolor="#107d59")
