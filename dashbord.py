@@ -429,7 +429,7 @@ def main():
         if uploaded_file is not None:
             data = load_data(uploaded_file)
             st.header("Amélioration du Modèle de Référence")
-            st.write("""Dans cette partie au niveau du dataframe, nous avons retirer les valeur aberantes. Les valeurs aberrantes seront détectées en utilisant les limites de l'écart interquartile (IQR).""")
+            st.write("""Dans cette partie au niveau du dataframe, nous allons retirer les valeur aberantes qui pourrais influencer le output du modele. Les valeurs aberrantes seront détectées en utilisant les limites de l'écart interquartile (IQR).""")
             if 'BAD' in data.columns and data['BAD'].dtype in ['int64', 'float64']:
                 bins = [-1, 0, 1]  # Ajustez ces seuils selon vos besoins
                 labels = ['Conforme', 'En défaut']
