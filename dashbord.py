@@ -404,6 +404,21 @@ def main():
                 f1 = f1_score(y_test, y_pred, average='weighted', pos_label='En défaut')  # Spécifiez pos_label explicitement
                 cm = confusion_matrix(y_test, y_pred)
 
+                st.subheader("Explication des éléments de la matrice")
+                st.write("""
+                **True Positives (TP) : 946**  
+                Ces sont les cas où le modèle a correctement prédit la classe positive (classe 0).
+                
+                **False Positives (FP) : 31**  
+                Ces sont les cas où le modèle a prédit la classe positive (classe 0) à tort, alors que la classe réelle était négative (classe 1).
+                
+                **False Negatives (FN) : 149**  
+                Ces sont les cas où le modèle a prédit la classe négative (classe 1) à tort, alors que la classe réelle était positive (classe 0).
+                
+                **True Negatives (TN) : 66**  
+                Ces sont les cas où le modèle a correctement prédit la classe négative (classe 1).
+                """)
+
                 st.write(f"Accuracy: {accuracy}, F1 Score: {f1}")
                 cm_fig = px.imshow(cm, text_auto=True, color_continuous_scale=[(0, "#102429"), (1, "#107d59")], title="Matrice de Confusion", template="plotly_white")
                 st.plotly_chart(cm_fig)
