@@ -425,6 +425,11 @@ def main():
                 Ces sont les cas où le modèle a correctement prédit la classe négative (classe 1).
                 """)
 
+                st.subheader("Améliorations possibles")
+                st.write("""
+                Si la réduction des faux négatifs est une priorité, des ajustements au seuil de décision ou des techniques de rééchantillonnage pourraient être nécessaires.
+                Il pourrait être bénéfique d'examiner les caractéristiques des faux négatifs pour comprendre pourquoi le modèle se trompe et apporter des modifications aux données d'entraînement ou à l'algorithme.
+                """)
                 # Calcul des métriques
                 fpr, tpr, _ = roc_curve(y_test, y_prob, pos_label='En défaut')
                 roc_auc = auc(fpr, tpr)
@@ -441,6 +446,15 @@ def main():
                   - La courbe ROC permet de visualiser le compromis entre la sensibilité (taux de vrais positifs) et la spécificité (1 - taux de faux positifs) pour différents seuils de classification. Un modèle parfait aurait une courbe ROC qui passe par le point (0, 1).
                 """)
 
+                st.subheader("Améliorations possibles")
+                st.write("""
+                - **Ajustement du Seuil :**
+                  - En ajustant le seuil de classification, vous pouvez augmenter la sensibilité ou la spécificité en fonction de vos priorités. Par exemple, si les faux négatifs sont plus coûteux, vous pouvez abaisser le seuil pour augmenter la sensibilité.
+                  
+                - **Amélioration du Modèle :**
+                  - En utilisant des techniques comme l'ajout de plus de données, l'ingénierie des caractéristiques ou l'essai d'algorithmes plus sophistiqués, vous pouvez potentiellement améliorer l'AUC.
+                """)
+
                 precision, recall, _ = precision_recall_curve(y_test, y_prob, pos_label='En défaut')
                 pr_fig = px.area(x=recall, y=precision, title='Courbe de Précision-Rappel', labels=dict(x='Rappel', y='Précision'), template="plotly_white")
                 pr_fig.update_traces(fillcolor="#107d59")
@@ -454,6 +468,18 @@ def main():
                 
                 - **Compromis entre Précision et Rappel :**
                   - En général, il existe un compromis entre la précision et le rappel. En augmentant le rappel (détecter plus de vrais positifs), la précision peut diminuer (augmenter les faux positifs), et vice versa.
+                """)
+
+                st.subheader("Améliorations possibles")
+                st.write("""
+                - **Ajustement du Seuil :**
+                  - Ajuster le seuil de décision permet d'optimiser la précision ou le rappel selon les priorités du problème. Par exemple, si les faux négatifs sont coûteux, vous pouvez abaisser le seuil pour augmenter le rappel.
+                
+                - **Stratégies de rééchantillonnage :**
+                  - Pour améliorer les performances sur des classes déséquilibrées, vous pouvez utiliser des techniques de rééchantillonnage comme le suréchantillonnage de la classe minoritaire ou le sous-échantillonnage de la classe majoritaire.
+                
+                - **Enrichissement des données :**
+                  - Ajouter plus de données, particulièrement pour la classe minoritaire, peut aider à améliorer les performances globales du modèle.
                 """)
 
                 st.write("Meilleurs hyperparamètres :", grid_search.best_params_)
