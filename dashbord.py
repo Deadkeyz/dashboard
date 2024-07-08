@@ -429,8 +429,7 @@ def main():
         if uploaded_file is not None:
             data = load_data(uploaded_file)
             st.header("Amélioration du Modèle de Référence")
-                st.write("""Dans cette partie au niveau du dataframe nous avons retirer les valeur aberantes 
-            """)
+            st.write("""Dans cette partie au niveau du dataframe, nous avons retirer les valeur aberantes. Les valeurs aberrantes seront détectées en utilisant les limites de l'écart interquartile (IQR).""")
             if 'BAD' in data.columns and data['BAD'].dtype in ['int64', 'float64']:
                 bins = [-1, 0, 1]  # Ajustez ces seuils selon vos besoins
                 labels = ['Conforme', 'En défaut']
@@ -448,7 +447,7 @@ def main():
                 data['NINQ'].fillna(data['NINQ'].median(), inplace=True)
                 data['CLNO'].fillna(data['CLNO'].median(), inplace=True)
                 data['DEBTINC'].fillna(data['DEBTINC'].median(), inplace=True)
-                st.write("Les valeurs aberrantes seront détectées en utilisant les limites de l'écart interquartile (IQR).")
+                st.write("")
 
                 numeric_columns = data.select_dtypes(include=[np.number]).columns
                 outlier_counts = {}
