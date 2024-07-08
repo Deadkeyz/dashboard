@@ -429,8 +429,8 @@ def main():
         if uploaded_file is not None:
             data = load_data(uploaded_file)
             st.header("Amélioration du Modèle de Référence")
-            
-            st.header("Prise en compte des valeurs aberrantes")
+                st.write("""Dans cette partie au niveau du dataframe nous avons retirer les valeur aberantes 
+            """)
             if 'BAD' in data.columns and data['BAD'].dtype in ['int64', 'float64']:
                 bins = [-1, 0, 1]  # Ajustez ces seuils selon vos besoins
                 labels = ['Conforme', 'En défaut']
@@ -467,8 +467,6 @@ def main():
 
                 st.write("Nombre de valeurs aberrantes détectées par colonne :")
                 st.write(outlier_counts)
-                st.write("Dans cette partie qui consiste a l'amelioration de notre modele , nous avons choisi de dimimuer leurs impacts des valeurs extreme sur nos prediction en utilisant le logarithme")
-                st.write('Et comme la classe 0 contient la plus part des obserrvations nous allons equilibrer les poids pour que notre modele puisse avoir des informations equilibrer pour la classification')
                 st.header("Analyse Exploratoire des Données")
 
                 colors = ['#80b784', '#668d68', '#4d734d', '#335a33']
