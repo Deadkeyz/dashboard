@@ -461,6 +461,7 @@ def main():
                         upper_bound = Q3 + 1.5 * IQR
                         outliers = data[(data[col] < lower_bound) | (data[col] > upper_bound)]
                         outlier_counts[col] = len(outliers)
+                        data = data[~((data[col] < lower_bound) | (data[col] > upper_bound))]
                     except Exception as e:
                         st.write(f"Error processing column {col}: {e}")
 
