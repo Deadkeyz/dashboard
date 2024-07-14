@@ -257,7 +257,7 @@ def main():
                             fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=colors)
                             fig.add_trace(go.Histogram(
                                 x=outliers[col],
-                                name='Outliers',
+                                name='Valeur aberrante',
                                 marker=dict(color='red')
                             ))
                             st.plotly_chart(fig)
@@ -301,7 +301,7 @@ def main():
                                 fig.add_trace(go.Box(
                                     y=outliers[col],
                                     x=outliers['BAD'],
-                                    name='Outliers',
+                                    name='Valeur aberrante',
                                     marker=dict(color='red')
                                 ))
                             else:
@@ -568,7 +568,7 @@ def main():
                             fig = px.histogram(data, x=col, title=f"Distribution de {col}", color_discrete_sequence=colors)
                             fig.add_trace(go.Histogram(
                                 x=outliers[col],
-                                name='Outliers',
+                                name='Valeur aberrante',
                                 marker=dict(color='red')
                             ))
                             st.plotly_chart(fig)
@@ -612,7 +612,7 @@ def main():
                                 fig.add_trace(go.Box(
                                     y=outliers[col],
                                     x=outliers['BAD'],
-                                    name='Outliers',
+                                    name='Valeur aberrante',
                                     marker=dict(color='red')
                                 ))
                             else:
