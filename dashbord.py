@@ -409,27 +409,6 @@ def main():
                 st.write(f"Accuracy: {accuracy}, F1 Score: {f1}")
                 cm_fig = px.imshow(cm, text_auto=True, color_continuous_scale=[(0, "#102429"), (1, "#107d59")], title="Matrice de Confusion", template="plotly_white")
                 st.plotly_chart(cm_fig)
-
-                st.subheader("Explication des éléments de la matrice")
-                st.write("""
-                **True Positives (TP) : 946**  
-                Ces sont les cas où le modèle a correctement prédit la classe positive (classe 0).
-                
-                **False Positives (FP) : 31**  
-                Ces sont les cas où le modèle a prédit la classe positive (classe 0) à tort, alors que la classe réelle était négative (classe 1).
-                
-                **False Negatives (FN) : 149**  
-                Ces sont les cas où le modèle a prédit la classe négative (classe 1) à tort, alors que la classe réelle était positive (classe 0).
-                
-                **True Negatives (TN) : 66**  
-                Ces sont les cas où le modèle a correctement prédit la classe négative (classe 1).
-                """)
-
-                st.subheader("Améliorations possibles")
-                st.write("""
-                Si la réduction des faux négatifs est une priorité, des ajustements au seuil de décision ou des techniques de rééchantillonnage pourraient être nécessaires.
-                Il pourrait être bénéfique d'examiner les caractéristiques des faux négatifs pour comprendre pourquoi le modèle se trompe et apporter des modifications aux données d'entraînement ou à l'algorithme.
-                """)
                 # Calcul des métriques
                 fpr, tpr, _ = roc_curve(y_test, y_prob, pos_label='En défaut')
                 roc_auc = auc(fpr, tpr)
