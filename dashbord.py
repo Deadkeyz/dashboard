@@ -164,7 +164,9 @@ def main():
                 * Nombre de demandes de crédit au cours des 6 derniers mois (NINQ) contient **510** valeurs manquantes.
                 * Nombre de lignes de crédit (CLNO) contient **221** valeurs manquantes.
                 * Indicateur de défaut (BAD) contient **0** valeurs manquantes.
-                * Montant du prêt (LOAN) contient **0** valeurs manquantes.     
+                * Montant du prêt (LOAN) contient **0** valeurs manquantes.  
+                * Ratio dette/revenu (DEBTINC) contient **1267** valeurs manquantes.  
+                
             """)
             if 'BAD' in data.columns and data['BAD'].dtype in ['int64', 'float64']:
                 bins = [-1, 0, 1]  # Ajustez ces seuils selon vos besoins
