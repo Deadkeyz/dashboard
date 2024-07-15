@@ -149,7 +149,7 @@ def main():
             st.subheader("Es ce que le jeux de donnee contient des valeur manquante ?")
 
             missing_data = data.isnull().sum()
-            st.write(missing_data[missing_data > 0])
+            st.write(missing_data)
             st.write(""" 
                 On remarque que bon nombre de variables ont des **valeurs manquantes**.
                 
